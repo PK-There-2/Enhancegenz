@@ -4,7 +4,7 @@ export function NewsletterCTA() {
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 animate-gradient">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-500 animate-gradient">
         <div className="absolute inset-0 bg-black/20" />
       </div>
       

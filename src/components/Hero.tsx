@@ -9,10 +9,10 @@ export function Hero({ onNavigateShop }: HeroProps) {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Light Mode Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-50 to-orange-100">
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-100 via-blue-50 to-cyan-100">
         {/* Animated gradient orbs */}
-        <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-purple-300 to-pink-300 rounded-full blur-3xl opacity-40 animate-float" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-orange-300 to-pink-300 rounded-full blur-3xl opacity-40 animate-float-delayed" />
+        <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-blue-300 to-cyan-300 rounded-full blur-3xl opacity-40 animate-float" />
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-teal-300 to-emerald-300 rounded-full blur-3xl opacity-40 animate-float-delayed" />
       </div>
 
       {/* Floating Clothing Images - Left Side */}
@@ -55,22 +55,22 @@ export function Hero({ onNavigateShop }: HeroProps) {
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto py-20">
         {/* Top Badges */}
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-8">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-purple-200">
-            <Sparkles className="w-4 h-4 text-purple-600" />
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-blue-200">
+            <Sparkles className="w-4 h-4 text-blue-600" />
             <span className="text-sm tracking-wider">NEW DROPS</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-pink-200">
-            <TrendingUp className="w-4 h-4 text-pink-600" />
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-cyan-200">
+            <TrendingUp className="w-4 h-4 text-cyan-600" />
             <span className="text-sm tracking-wider">TRENDING</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-orange-200">
-            <Zap className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-teal-200">
+            <Zap className="w-4 h-4 text-teal-600" />
             <span className="text-sm tracking-wider">LIMITED</span>
           </div>
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 tracking-tight bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
           THREAD TRENDS
         </h1>
 
@@ -88,7 +88,7 @@ export function Hero({ onNavigateShop }: HeroProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
             onClick={onNavigateShop}
-            className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
           >
             Explore Now
           </button>
