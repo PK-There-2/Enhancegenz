@@ -2,8 +2,8 @@ import { ShoppingBag, Search, User, Menu, X, Package, UserCircle } from 'lucide-
 import { useState, useRef, useEffect } from 'react';
 
 interface HeaderProps {
-  currentPage: 'home' | 'shop';
-  onNavigate: (page: 'home' | 'shop') => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact') => void;
 }
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -54,10 +54,16 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
             >
               Shop
             </button>
-            <button className="hover:opacity-60 transition-opacity opacity-60">
+            <button 
+              onClick={() => onNavigate('about')}
+              className={`hover:opacity-60 transition-opacity ${currentPage === 'about' ? 'opacity-100' : 'opacity-60'}`}
+            >
               About
             </button>
-            <button className="hover:opacity-60 transition-opacity opacity-60">
+            <button 
+              onClick={() => onNavigate('contact')}
+              className={`hover:opacity-60 transition-opacity ${currentPage === 'contact' ? 'opacity-100' : 'opacity-60'}`}
+            >
               Contact
             </button>
           </nav>
@@ -139,10 +145,22 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               >
                 Shop
               </button>
-              <button className="hover:opacity-60 transition-opacity text-left">
+              <button 
+                onClick={() => {
+                  onNavigate('about');
+                  setIsMenuOpen(false);
+                }}
+                className="hover:opacity-60 transition-opacity text-left"
+              >
                 About
               </button>
-              <button className="hover:opacity-60 transition-opacity text-left">
+              <button 
+                onClick={() => {
+                  onNavigate('contact');
+                  setIsMenuOpen(false);
+                }}
+                className="hover:opacity-60 transition-opacity text-left"
+              >
                 Contact
               </button>
               
