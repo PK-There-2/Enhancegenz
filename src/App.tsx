@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { AnimatedMarquee } from './components/AnimatedMarquee';
 import { BestSellers } from './components/BestSellers';
+import { ShopByChoice } from './components/ShopByChoice';
 import { CollectionsGrid } from './components/CollectionsGrid';
 import { NewsletterCTA } from './components/NewsletterCTA';
 import { FeaturesSection } from './components/FeaturesSection';
@@ -32,6 +33,7 @@ export default function App() {
             <Hero onNavigateShop={navigateToShop} />
             <AnimatedMarquee />
             <BestSellers onNavigateShop={navigateToShop} />
+            <ShopByChoice onNavigateShop={navigateToShop} />
             <CollectionsGrid onNavigateShop={navigateToShop} />
             <FeaturesSection />
             <NewsletterCTA />
