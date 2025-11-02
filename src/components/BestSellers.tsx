@@ -47,21 +47,21 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
         {/* Header with glossy effect */}
         <div className="mb-12 text-center">
           <div className="inline-block mb-4">
-            <span className="text-sm tracking-widest uppercase bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              ⚡ Best Sellers
+            <span className="text-sm font-extrabold text-black tracking-widest uppercase">
+            Best Sellers
             </span>
           </div>
           <h2 className="text-5xl sm:text-6xl mb-6 relative">
             Most Loved Pieces
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
-          </h2>
+            </h2>
+
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Our community's favorites. These pieces sell out fast ⚡
+            Our community's favorites. These pieces sell out fast
           </p>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12">
+        {/* Products Grid - Larger Containers */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 mb-16">
           {bestSellerProducts.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}

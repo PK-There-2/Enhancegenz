@@ -61,7 +61,7 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl sm:text-4xl">Shop by Choice</h2>
+          <h1 className="text-3xl sm:text-4xl">Shop by Choice</h1>
           
           {/* Navigation Arrows - Desktop */}
           <div className="hidden md:flex items-center gap-2">
@@ -86,7 +86,7 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
         <div className="relative">
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+            className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
