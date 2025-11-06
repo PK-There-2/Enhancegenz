@@ -1,8 +1,7 @@
 import { ShoppingBag, Search, User, Menu, X, Package, UserCircle , Shield , LogOut , Heart  } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useAuth } from './AuthContext';
-import { useCart } from './CartContext';
-import { useWishlist } from './WishlistContext';
+import { useAuth } from './AuthContext.tsx';
+import { useCart } from './CartContext.tsx';
 
 
 interface HeaderProps {
@@ -14,7 +13,7 @@ interface HeaderProps {
 export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { getCartCount } = useCart();
-  const { getWishlistCount } = useWishlist();
+  const getWishlistCount = () => 0;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
