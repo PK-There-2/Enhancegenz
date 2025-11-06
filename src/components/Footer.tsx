@@ -57,10 +57,10 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-white/60">
-            © 2025 Thread Trends. All rights reserved.
+            © 2025 Thread Trends. Mrityunjay Technologies. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-white/60 hover:text-white transition-colors">
+            <a href="https://www.instagram.com/threadtrends.in?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="text-white/60 hover:text-white transition-colors">
               <Instagram className="w-5 h-5" />
             </a>
             <a href="#" className="text-white/60 hover:text-white transition-colors">

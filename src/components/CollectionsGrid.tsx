@@ -31,9 +31,18 @@ export function CollectionsGrid({ onNavigateShop }: CollectionsGridProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12">
-          <h2 className="text-5xl sm:text-6xl mb-4">Shop by Vibe</h2>
-          <p className="text-gray-600 text-lg max-w-2xl">
-            Find your style, express yourself 🎨
+          <h2 
+            className="text-3xl sm:text-4xl mb-4"
+            style={{
+              fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", sans-serif',
+              fontWeight: 150,
+              letterSpacing: '-0.02em'
+            }}
+          >
+            Shop by Vibe
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl">
+            Find your style, express yourself
           </p>
         </div>
 

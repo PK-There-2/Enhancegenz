@@ -1,20 +1,33 @@
-import { ShoppingBag, Search, User, Menu, X, Package, UserCircle } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, Package, UserCircle , Shield , LogOut , Heart  } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { useCart } from './CartContext';
+import { useWishlist } from './WishlistContext';
+
 
 interface HeaderProps {
-  currentPage: 'home' | 'shop' | 'about' | 'contact';
-  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact') => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin') => void;
+  onOpenAuth: () => void;
 }
 
-export function Header({ currentPage, onNavigate }: HeaderProps) {
+export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
+  const { user, signOut } = useAuth();
+  const { getCartCount } = useCart();
+  const { getWishlistCount } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [showWishlist, setShowWishlist] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const wishlistMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
         setShowAccountMenu(false);
+      }
+      if (wishlistMenuRef.current && !wishlistMenuRef.current.contains(event.target as Node)) {
+        setShowWishlist(false);
       }
     }
 
@@ -28,9 +41,8 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
       <div className="bg-black text-white py-2 px-4 text-center">
         <p className="text-sm">🎉 Free Shipping Across India | Shop Now</p>
       </div>
-
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ {/* Main Header */}
+ <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button 
@@ -74,6 +86,33 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               <Search className="w-5 h-5" />
             </button>
             
+            {/* Wishlist Dropdown */}
+            <div className="relative hidden sm:block" ref={wishlistMenuRef}>
+              <button 
+                onClick={() => setShowWishlist(!showWishlist)}
+                className="hover:opacity-60 transition-opacity relative"
+              >
+                <Heart className="w-5 h-5" />
+                {getWishlistCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {getWishlistCount()}
+                  </span>
+                )}
+              </button>
+
+              {/* Wishlist Dropdown */}
+              {showWishlist && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn">
+                  <h3 className="text-xl mb-4">Wishlist ({getWishlistCount()})</h3>
+                  {getWishlistCount() === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Your wishlist is empty</p>
+                  ) : (
+                    <p className="text-gray-600">View your wishlist items in your account</p>
+                  )}
+                </div>
+              )}
+            </div>
+            
             {/* Account Dropdown */}
             <div className="relative hidden sm:block" ref={accountMenuRef}>
               <button 
@@ -86,33 +125,102 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               {/* Account Menu Dropdown */}
               {showAccountMenu && (
                 <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn">
-                  <h3 className="text-xl mb-4">Account</h3>
-                  
-                  {/* Sign In Button */}
-                  <button className="w-full py-4 bg-black text-white hover:bg-gray-800 transition-colors mb-4 rounded-lg">
-                    Sign in
-                  </button>
+                  {user ? (
+                    <>
+                      <div className="mb-4 pb-4 border-b border-gray-200">
+                        <p className="text-sm text-gray-600">Signed in as</p>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <button 
+                          onClick={() => {
+                            onNavigate('profile');
+                            setShowAccountMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                        >
+                          <UserCircle className="w-5 h-5" />
+                          <span>My Account</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left">
+                          <Package className="w-5 h-5" />
+                          <span>My Orders</span>
+                        </button>
+                        {user.role === 'admin' && (
+                          <button 
+                            onClick={() => {
+                              onNavigate('admin');
+                              setShowAccountMenu(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-left"
+                          >
+                            <Shield className="w-5 h-5" />
+                            <span>Admin Dashboard</span>
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => {
+                            signOut();
+                            setShowAccountMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 transition-colors text-left border-t border-gray-200"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-xl mb-4">Account</h3>
+                      
+                      <button 
+                        onClick={() => {
+                          onOpenAuth();
+                          setShowAccountMenu(false);
+                        }}
+                        className="w-full py-4 bg-black text-white hover:bg-gray-800 transition-colors mb-4"
+                      >
+                        Sign In / Sign Up
+                      </button>
 
-                  {/* Quick Links */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <button className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors rounded-lg">
-                      <Package className="w-5 h-5" />
-                      <span>Orders</span>
-                    </button>
-                    <button className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors rounded-lg">
-                      <UserCircle className="w-5 h-5" />
-                      <span>Profile</span>
-                    </button>
-                  </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button 
+                          onClick={() => {
+                            onOpenAuth();
+                            setShowAccountMenu(false);
+                          }}
+                          className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
+                        >
+                          <Package className="w-5 h-5" />
+                          <span>Orders</span>
+                        </button>
+                        <button 
+                          onClick={() => {
+                            onOpenAuth();
+                            setShowAccountMenu(false);
+                          }}
+                          className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
+                        >
+                          <UserCircle className="w-5 h-5" />
+                          <span>Profile</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
 
             <button className="hover:opacity-60 transition-opacity relative">
               <ShoppingBag className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                0
-              </span>
+              {getCartCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              )}
             </button>
             <button 
               className="md:hidden hover:opacity-60 transition-opacity"
@@ -166,26 +274,84 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
               
               {/* Mobile Account Section */}
               <div className="pt-4 border-t border-gray-200 space-y-3">
-                <button className="w-full py-3 bg-black text-white rounded-lg">
-                  Sign in
-                </button>
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="flex items-center justify-center gap-2 py-3 border border-black rounded-lg">
-                    <Package className="w-4 h-4" />
-                    <span className="text-sm">Orders</span>
-                  </button>
-                  <button className="flex items-center justify-center gap-2 py-3 border border-black rounded-lg">
-                    <UserCircle className="w-4 h-4" />
-                    <span className="text-sm">Profile</span>
-                  </button>
-                </div>
+                {user ? (
+                  <>
+                    <div className="mb-3">
+                      <p className="text-sm text-gray-600">Signed in as</p>
+                      <p className="font-medium">{user.name}</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        onNavigate('profile');
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full py-3 border border-black hover:bg-gray-50"
+                    >
+                      My Account
+                    </button>
+                    {user.role === 'admin' && (
+                      <button 
+                        onClick={() => {
+                          onNavigate('admin');
+                          setIsMenuOpen(false);
+                        }}
+                        className="w-full py-3 bg-blue-600 text-white"
+                      >
+                        Admin Dashboard
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full py-3 border border-red-600 text-red-600 hover:bg-red-50"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => {
+                        onOpenAuth();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full py-3 bg-black text-white"
+                    >
+                      Sign In / Sign Up
+                    </button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button 
+                        onClick={() => {
+                          onOpenAuth();
+                          setIsMenuOpen(false);
+                        }}
+                        className="flex items-center justify-center gap-2 py-3 border border-black"
+                      >
+                        <Package className="w-4 h-4" />
+                        <span className="text-sm">Orders</span>
+                      </button>
+                      <button 
+                        onClick={() => {
+                          onOpenAuth();
+                          setIsMenuOpen(false);
+                        }}
+                        className="flex items-center justify-center gap-2 py-3 border border-black"
+                      >
+                        <UserCircle className="w-4 h-4" />
+                        <span className="text-sm">Profile</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </nav>
           </div>
         )}
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

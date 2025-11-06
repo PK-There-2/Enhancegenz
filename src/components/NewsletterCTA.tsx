@@ -1,33 +1,34 @@
-import { Mail, Sparkles } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import backgroundImage from './hey.png';
 
 export function NewsletterCTA() {
   return (
     <section className="py-20 relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-500 animate-gradient">
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
+      {/* Animated gradient background with hey.png overlay */}
+      <div
+        className="absolute inset-0 -z-10 animate-gradient"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundBlendMode: 'overlay',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      />
+      <div className="absolute inset-0 bg-black/20 -z-10" />
       
-      {/* Glossy lines */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-      
-      {/* Floating elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 backdrop-blur-sm rounded-full animate-float" />
-      <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 backdrop-blur-sm rounded-full animate-float-delayed" />
-
+     
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Icon */}
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-6 animate-pulse-slow">
+        {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-6 animate-pulse-slow">
           <Sparkles className="w-8 h-8 text-white" />
-        </div>
+        </div> */}
 
         {/* Content */}
         <h2 className="text-4xl sm:text-5xl md:text-6xl mb-6 text-white">
           Join the Thread Fam
         </h2>
-        <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-          Get early access to drops, exclusive deals, and style inspo straight to your inbox 💌
+        <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl mx-auto">
+          Get early access to drops, exclusive deals, and style inspo straight to your inbox 
         </p>
 
         {/* Newsletter Form */}
@@ -44,11 +45,11 @@ export function NewsletterCTA() {
         </div>
 
         <p className="text-sm text-white/70 mt-4">
-          No spam, just good vibes ✨
+          No spam, just good vibes
         </p>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes gradient {
           0% {
             background-position: 0% 50%;

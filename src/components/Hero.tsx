@@ -1,6 +1,11 @@
-import { Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import backgroundImage from './unnamed2.jpg';
+import heroBackground from './unnamed2.jpg';
+import oneImage from './one.png';
+import twoImage from './two.png';
+import threeImage from './three.png';
+import fourImage from './four.png';
+import fiveImage from './five.png';
+import sixImage from './six.png';
 
 interface HeroProps {
   onNavigateShop: () => void;
@@ -12,7 +17,7 @@ export function Hero({ onNavigateShop }: HeroProps) {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <ImageWithFallback
-          src={backgroundImage}
+          src={heroBackground}
           alt="Background"
           className="w-full h-full object-cover"
         />
@@ -22,35 +27,50 @@ export function Hero({ onNavigateShop }: HeroProps) {
 
       {/* Floating Clothing Images - Left Side */}
       <div className="absolute left-4 sm:left-8 md:left-16 top-1/2 -translate-y-1/2 space-y-6 hidden lg:block">
-        <div className="w-45 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[-12deg] animate-float border-4 border-white">
+        <div className="w-89 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[-12deg] animate-float border-4 border-white">
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1620799139834-6b8f844fbe61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb2xkZWQlMjB0c2hpcnQlMjB3aGl0ZXxlbnwxfHx8fDE3NjE5ODA5MTh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+            src={oneImage}
             alt="T-Shirt"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div className="w-45 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[8deg] animate-float-delayed ml-8 border-4 border-white">
+          <ImageWithFallback
+            src={twoImage}
+            alt="Jacket"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="w-45 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[8deg] animate-float-delayed ml-8 border-4 border-white">
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1556366184-cc9bcb828ad8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGphY2tldCUyMGhhbmdpbmd8ZW58MXx8fHwxNzYxOTgwOTE5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+            src={threeImage}
             alt="Jacket"
             className="w-full h-full object-cover"
           />
         </div>
       </div>
-
+      
       {/* Floating Clothing Images - Right Side */}
       <div className="absolute right-4 sm:right-8 md:right-16 top-1/2 -translate-y-1/2 space-y-6 hidden lg:block">
         <div className="w-40 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[12deg] animate-float-delayed border-4 border-white">
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1759542890353-35f5568c1c90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbmVha2VycyUyMGZhc2hpb24lMjB3aGl0ZXxlbnwxfHx8fDE3NjE5ODA5MTl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+            src={fourImage}
             alt="Sneakers"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="w-40 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[-8deg] animate-float mr-8 border-4 border-white">
           <ImageWithFallback
-            src="https://images.unsplash.com/photo-1572858236188-145ddd374640?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob29kaWUlMjBzdHJlZXR3ZWFyJTIwcHJvZHVjdHxlbnwxfHx8fDE3NjE5ODA5MjB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+            src={fiveImage}
             alt="Hoodie"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="w-45 h-32 rounded-2xl overflow-hidden shadow-2xl rotate-[8deg] animate-float-delayed ml-8 border-4 border-white">
+          <ImageWithFallback
+            src={sixImage}
+            alt="Jacket"
             className="w-full h-full object-cover"
           />
         </div>
@@ -104,8 +124,13 @@ export function Hero({ onNavigateShop }: HeroProps) {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
-            onClick={onNavigateShop}
-            className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            onClick={() => {
+              const target = document.getElementById('best-sellers');
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-white-600 hover:to-black-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
           >
             Explore Now
           </button>

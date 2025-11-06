@@ -57,11 +57,20 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-3 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl sm:text-4xl">Shop by Choice</h1>
+          <h1 
+            className="text-3xl sm:text-4xl"
+            style={{
+              fontFamily: '"Inter", "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", sans-serif',
+              fontWeight: 250,
+              letterSpacing: '-0.02em'
+            }}
+          >
+            Shop by Choice
+          </h1>
           
           {/* Navigation Arrows - Desktop */}
           <div className="hidden md:flex items-center gap-2">
@@ -125,7 +134,7 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

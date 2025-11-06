@@ -4,9 +4,10 @@ import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 // Sample product data
 const products = [
+  // ... same as before
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1715865871494-6bba579c2dc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGplYW5zJTIwZmFzaGlvbnxlbnwxfHx8fDE3NjE5NTQxMzl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'Passion & Purpose Tee',
     price: 1299,
     originalPrice: 1899,
@@ -17,7 +18,7 @@ const products = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1702609342206-c37562b99740?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmFwaGljJTIwdGVlJTIwZGVzaWdufGVufDF8fHx8MTc2MTk3NzU5NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1504198458649-3128b932f49e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTAyMjgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'The Cynosure Tee',
     price: 1299,
     originalPrice: 1899,
@@ -39,7 +40,7 @@ const products = [
   },
   {
     id: 4,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1715865871494-6bba579c2dc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGplYW5zJTIwZmFzaGlvbnxlbnwxfHx8fDE3NjE5NTQxMzl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'Oversized Graphic T-Shirt',
     price: 899,
     originalPrice: 1499,
@@ -68,7 +69,7 @@ const products = [
   },
   {
     id: 7,
-    image: 'https://images.unsplash.com/photo-1614990354198-b06764dcb13c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTc4NzQ0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1504198458649-3128b932f49e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTAyMjgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'Retro Windbreaker',
     price: 3499,
     category: 'Jackets',
@@ -77,7 +78,7 @@ const products = [
   },
   {
     id: 8,
-    image: 'https://images.unsplash.com/photo-1617229378071-daa5eeff0db7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwYWNjZXNzb3JpZXMlMjBtaW5pbWFsfGVufDF8fHx8MTc2MTk3ODc0M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1504198458649-3128b932f49e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTAyMjgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'Minimalist Backpack',
     price: 1999,
     category: 'Accessories',
@@ -86,7 +87,7 @@ const products = [
   },
   {
     id: 9,
-    image: 'https://images.unsplash.com/photo-1702609342206-c37562b99740?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmFwaGljJTIwdGVlJTIwZGVzaWdufGVufDF8fHx8MTc2MTk3NzU5NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: 'https://images.unsplash.com/photo-1504198458649-3128b932f49e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTAyMjgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     name: 'Essential White Tee',
     price: 799,
     category: 'Essentials',
@@ -122,7 +123,9 @@ const products = [
   }
 ];
 
-export function Shop() {
+interface ShopProps { onOpenProduct: (product: any) => void }
+
+export function Shop({ onOpenProduct }: ShopProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -178,12 +181,24 @@ export function Shop() {
   });
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-10 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
-        <div className="mb-12">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl mb-4">Shop All</h1>
-          <p className="text-gray-600 max-w-2xl text-lg">
+        <div className="mb-10 mt-4">
+          <div className="flex flex-col items-center mb-4">
+            <h4 className="font-sans text-2xl sm:text-3xl lg:text-4xl text-center tracking-tight">All Products</h4>
+            {/* Animated underline - shimmer */}
+            <div className="relative mt-2 h-1 w-20 overflow-hidden rounded-full bg-black/20">
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black to-transparent animate-[shimmer_1.6s_linear_infinite]" />
+            </div>
+            <style>{`
+              @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+              }
+            `}</style>
+          </div>
+          <p className="font-sans text-gray-600 text-sm text-center">
             Discover our curated collection of premium clothing designed for the modern wardrobe
           </p>
         </div>
@@ -255,7 +270,13 @@ export function Shop() {
                               onChange={() => toggleCategory(cat.value)}
                               className="peer sr-only"
                             />
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-pink-500 peer-checked:border-pink-500 transition-all flex items-center justify-center">
+                            <div
+                              className="w-5 h-5 border-2 rounded transition-all flex items-center justify-center"
+                              style={{
+                                backgroundColor: selectedCategories.includes(cat.value) ? '#000' : 'transparent',
+                                borderColor: selectedCategories.includes(cat.value) ? '#000' : '#d1d5db'
+                              }}
+                            >
                               {selectedCategories.includes(cat.value) && (
                                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -281,11 +302,54 @@ export function Shop() {
                           step="100"
                           value={priceRange[1]}
                           onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                          className="w-full h-2 bg-black rounded-lg appearance-none cursor-pointer accent-black"
                           style={{
-                            background: `linear-gradient(to right, #ec4899 0%, #ec4899 ${(priceRange[1] / 5000) * 100}%, #e5e7eb ${(priceRange[1] / 5000) * 100}%, #e5e7eb 100%)`
+                            background: `linear-gradient(to right, #000 0%, #000 ${(priceRange[1] / 5000) * 100}%, #e5e7eb ${(priceRange[1] / 5000) * 100}%, #e5e7eb 100%)`
                           }}
                         />
+                        {/* Custom larger gray circle/handle, positioned further down the track */}
+                        <style>
+                          {`
+                            input[type="range"]::-webkit-slider-thumb {
+                              height: 32px;
+                              width: 32px;
+                              border-radius: 50%;
+                              background: #e5e7eb;
+                              cursor: pointer;
+                              margin-top: 0px; /* Move thumb further down relative to the track */
+                              margin-left: 2px;
+                            }
+                            input[type="range"]:focus::-webkit-slider-thumb {
+                        
+                            }
+                            input[type="range"]::-moz-range-thumb {
+                              height: 32px;
+                              width: 32px;
+                              border-radius: 50%;
+                              background: #e5e7eb;
+                              cursor: pointer;
+                            }
+                            input[type="range"]:focus::-moz-range-thumb {
+                              outline: 2px solid #000;
+                            }
+                            input[type="range"]::-ms-thumb {
+                              height: 32px;
+                              width: 32px;
+                              border-radius: 50%;
+                              background: #e5e7eb;
+                              cursor: pointer;
+                            
+                              margin-top: 8px; /* Move thumb down for IE/Edge */
+                            }
+                            input[type="range"]:focus::-ms-thumb {
+                              outline: 2px solid #000;
+                            }
+                            /* Adjust the track height so the thumb appears visually further down */
+                            input[type="range"] {
+                              height: 8px;
+                            }
+                          `}
+                        </style>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Rs. {priceRange[0]}</span>
@@ -304,8 +368,8 @@ export function Shop() {
                           onClick={() => toggleSize(size)}
                           className={`py-3 border-2 rounded-lg transition-all ${
                             selectedSizes.includes(size)
-                              ? 'border-pink-500 bg-pink-50 text-pink-600'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-black bg-black text-white'
+                              : 'border-gray-200 hover:border-black'
                           }`}
                         >
                           {size}
@@ -352,7 +416,13 @@ export function Shop() {
                               onChange={() => toggleCategory(cat.value)}
                               className="peer sr-only"
                             />
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-pink-500 peer-checked:border-pink-500 transition-all flex items-center justify-center">
+                            <div
+                              className="w-5 h-5 border-2 rounded transition-all flex items-center justify-center"
+                              style={{
+                                backgroundColor: selectedCategories.includes(cat.value) ? '#000' : 'transparent',
+                                borderColor: selectedCategories.includes(cat.value) ? '#000' : '#d1d5db'
+                              }}
+                            >
                               {selectedCategories.includes(cat.value) && (
                                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -376,7 +446,7 @@ export function Shop() {
                       step="100"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full accent-pink-500"
+                      className="w-full accent-black"
                     />
                     <div className="flex justify-between text-sm mt-2">
                       <span>Rs. {priceRange[0]}</span>
@@ -387,9 +457,11 @@ export function Shop() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-stretch">
               {sortedProducts.map((product) => (
-                <ProductCard key={product.id} {...product} />
+                <div key={product.id} className="h-full flex">
+                  <ProductCard {...product} onClick={() => onOpenProduct(product)} />
+                </div>
               ))}
             </div>
 

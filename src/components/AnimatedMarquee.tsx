@@ -3,22 +3,13 @@ export function AnimatedMarquee() {
 
   return (
     <div
-      // 🔧 Position controls
-      // fixed → stays in place while scrolling
-      // absolute → moves with layout
       className="
-        absolute        /* or use 'absolute' if you want it to scroll */
-        top-20     /* distance from top (adjust this to move up/down) */
-        left-0 right-0 
-        z-50
+        relative w-full
+        z-10
         bg-gradient-to-r 
         from-white-500 via-gray-400 via-white-400 via-gray-400 to-white-500 
-        py-12
-        overflow-hidden  
-        transition-transform 
-        duration-500 
-        hover:-translate-y-1
-        mt-5
+        py-2
+        overflow-hidden
       "
     >
       {/* Top glossy line */}
@@ -26,7 +17,7 @@ export function AnimatedMarquee() {
 
       {/* Scrolling text */}
       <div className="flex animate-marquee whitespace-nowrap">
-        <span className="text-blacl mx-4 text-lg tracking-wider font-semibold">
+        <span className="text-black mx-4 text-lg tracking-wider font-semibold">
           {text.repeat(10)}
         </span>
       </div>
