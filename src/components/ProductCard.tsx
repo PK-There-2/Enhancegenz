@@ -1,7 +1,10 @@
 import { Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useWishlist } from './WishlistContext';
+import { useState } from 'react';
 
 interface ProductCardProps {
+  id?: string | number;
   image: string;
   name: string;
   price: number;
@@ -11,7 +14,29 @@ interface ProductCardProps {
   onClick?: () => void;
 }
 
-export function ProductCard({ image, name, price, originalPrice, isSale, category, onClick }: ProductCardProps) {
+export function ProductCard({ id, image, name, price, originalPrice, isSale, category, onClick }: ProductCardProps) {
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const productId = id?.toString() || name;
+  const isWishlisted = isInWishlist(productId);
+  const [justAdded, setJustAdded] = useState(false);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isWishlisted) {
+      removeFromWishlist(productId);
+    } else {
+      addToWishlist({
+        productId,
+        name,
+        price,
+        image,
+        category
+      });
+      setJustAdded(true);
+      setTimeout(() => setJustAdded(false), 2000);
+    }
+  };
   return (
     <div onClick={onClick} className="group relative bg-white rounded-none overflow-hidden border border-black/5 hover:border-black/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl w-full h-full flex flex-col cursor-pointer">
       {/* Image */}
@@ -32,8 +57,15 @@ export function ProductCard({ image, name, price, originalPrice, isSale, categor
         )}
 
         {/* Wishlist Button */}
-        <button className="absolute top-3 right-3 w-10 h-10 bg-white/95 border border-black/10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black hover:text-white shadow-lg">
-          <Heart className="w-5 h-5" />
+        <button 
+          onClick={handleWishlistClick}
+          className={`absolute top-3 right-3 w-10 h-10 border rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
+            isWishlisted 
+              ? 'bg-black border-black text-white opacity-100' 
+              : 'bg-white/95 border-black/10 opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white'
+          } ${justAdded ? 'animate-bounce' : ''}`}
+        >
+          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
         </button>
       </div>
 

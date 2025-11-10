@@ -311,23 +311,27 @@ export function Shop({ onOpenProduct }: ShopProps) {
                         <style>
                           {`
                             input[type="range"]::-webkit-slider-thumb {
-                              height: 32px;
-                              width: 32px;
-                              border-radius: 50%;
-                              background: #e5e7eb;
+                              height: 16px;
+                              width: 16px;
+                              border-radius: 60%;
+                              background:rgb(22, 18, 18);
                               cursor: pointer;
-                              margin-top: 0px; /* Move thumb further down relative to the track */
+                              margin-top: 0px;
                               margin-left: 2px;
+                              -webkit-appearance: none;
+                              border-color: rgb(255, 255, 255);
+
                             }
                             input[type="range"]:focus::-webkit-slider-thumb {
-                        
+                              outline: 2px solid #0000;
                             }
                             input[type="range"]::-moz-range-thumb {
                               height: 32px;
                               width: 32px;
                               border-radius: 50%;
-                              background: #e5e7eb;
+                              background:rgb(255, 255, 255);
                               cursor: pointer;
+                              border: none;
                             }
                             input[type="range"]:focus::-moz-range-thumb {
                               outline: 2px solid #000;
@@ -336,15 +340,14 @@ export function Shop({ onOpenProduct }: ShopProps) {
                               height: 32px;
                               width: 32px;
                               border-radius: 50%;
-                              background: #e5e7eb;
+                              background: #000000;
                               cursor: pointer;
-                            
-                              margin-top: 8px; /* Move thumb down for IE/Edge */
+                              margin-top: 8px;
+                              border: none;
                             }
                             input[type="range"]:focus::-ms-thumb {
                               outline: 2px solid #000;
                             }
-                            /* Adjust the track height so the thumb appears visually further down */
                             input[type="range"] {
                               height: 8px;
                             }
@@ -460,7 +463,7 @@ export function Shop({ onOpenProduct }: ShopProps) {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-stretch">
               {sortedProducts.map((product) => (
                 <div key={product.id} className="h-full flex">
-                  <ProductCard {...product} onClick={() => onOpenProduct(product)} />
+                  <ProductCard {...product} id={product.id} onClick={() => onOpenProduct(product)} />
                 </div>
               ))}
             </div>

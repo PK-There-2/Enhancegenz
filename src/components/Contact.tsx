@@ -52,7 +52,7 @@ export function Contact() {
       <ContactSection />
 
       {/* Additional Info */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+      {/* <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl mb-6">Business Hours</h2>
           <div className="space-y-2 text-gray-700">
@@ -61,7 +61,7 @@ export function Contact() {
             <p>Sunday: 11:00 AM - 5:00 PM</p>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

@@ -98,7 +98,7 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
               <div key={product.id} className="w-full">
                 {/* ProductCard should handle image & content sizing internally.
                     Using w-full here ensures grid column sizing controls width. */}
-                <ProductCard {...product} />
+                <ProductCard {...product} id={product.id} />
               </div>
             ))}
           </div>

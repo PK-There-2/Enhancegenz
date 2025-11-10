@@ -4,6 +4,7 @@ import { cors } from 'npm:hono/cors';
 import { logger } from 'npm:hono/logger';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import * as kv from './kv_store.tsx';
+import { notificationService } from './notification_service.tsx';
 
 const app = new Hono();
 
@@ -264,6 +265,267 @@ app.get('/make-server-d9a3ff0a/user/orders', async (c) => {
   } catch (error) {
     console.error('Get orders error:', error);
     return c.json({ error: 'Failed to fetch orders' }, 500);
+  }
+});
+
+// ============================================
+// NOTIFICATION CONFIGURATION ROUTES (Admin Only)
+// ============================================
+
+// Configure SendGrid
+app.post('/make-server-d9a3ff0a/notifications/config/sendgrid', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const { apiKey, fromEmail } = await c.req.json();
+    
+    if (!apiKey || !fromEmail) {
+      return c.json({ error: 'API key and from email are required' }, 400);
+    }
+
+    notificationService.configureSendGrid(apiKey, fromEmail);
+    
+    // Store config in KV (encrypted in production)
+    await kv.set('notification:sendgrid', { apiKey, fromEmail, enabled: true });
+
+    return c.json({ success: true, message: 'SendGrid configured successfully' });
+  } catch (error) {
+    console.error('SendGrid config error:', error);
+    return c.json({ error: 'Failed to configure SendGrid' }, 500);
+  }
+});
+
+// Configure Mailgun
+app.post('/make-server-d9a3ff0a/notifications/config/mailgun', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const { apiKey, domain, fromEmail } = await c.req.json();
+    
+    if (!apiKey || !domain || !fromEmail) {
+      return c.json({ error: 'API key, domain, and from email are required' }, 400);
+    }
+
+    notificationService.configureMailgun(apiKey, domain, fromEmail);
+    
+    await kv.set('notification:mailgun', { apiKey, domain, fromEmail, enabled: true });
+
+    return c.json({ success: true, message: 'Mailgun configured successfully' });
+  } catch (error) {
+    console.error('Mailgun config error:', error);
+    return c.json({ error: 'Failed to configure Mailgun' }, 500);
+  }
+});
+
+// Configure Twilio
+app.post('/make-server-d9a3ff0a/notifications/config/twilio', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const { accountSid, authToken, fromPhone } = await c.req.json();
+    
+    if (!accountSid || !authToken || !fromPhone) {
+      return c.json({ error: 'Account SID, auth token, and from phone are required' }, 400);
+    }
+
+    notificationService.configureTwilio(accountSid, authToken, fromPhone);
+    
+    await kv.set('notification:twilio', { accountSid, authToken, fromPhone, enabled: true });
+
+    return c.json({ success: true, message: 'Twilio configured successfully' });
+  } catch (error) {
+    console.error('Twilio config error:', error);
+    return c.json({ error: 'Failed to configure Twilio' }, 500);
+  }
+});
+
+// Get notification configuration status
+app.get('/make-server-d9a3ff0a/notifications/config', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const sendgridConfig = await kv.get('notification:sendgrid');
+    const mailgunConfig = await kv.get('notification:mailgun');
+    const twilioConfig = await kv.get('notification:twilio');
+
+    return c.json({
+      sendgrid: sendgridConfig ? { enabled: true, configured: true } : { enabled: false, configured: false },
+      mailgun: mailgunConfig ? { enabled: true, configured: true } : { enabled: false, configured: false },
+      twilio: twilioConfig ? { enabled: true, configured: true } : { enabled: false, configured: false }
+    });
+  } catch (error) {
+    console.error('Get config error:', error);
+    return c.json({ error: 'Failed to get configuration' }, 500);
+  }
+});
+
+// Send test notification
+app.post('/make-server-d9a3ff0a/notifications/test', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const { type, recipient } = await c.req.json();
+
+    if (type === 'email') {
+      const success = await notificationService.sendEmail(
+        recipient,
+        'Test Email from Thread Trends',
+        '<h1>Test Email</h1><p>This is a test email from Thread Trends notification system.</p>',
+        'Test Email - This is a test email from Thread Trends notification system.'
+      );
+      return c.json({ success, message: success ? 'Test email sent' : 'Failed to send test email' });
+    } else if (type === 'sms') {
+      const success = await notificationService.sendSMS(recipient, 'Test SMS from Thread Trends! 🎉');
+      return c.json({ success, message: success ? 'Test SMS sent' : 'Failed to send test SMS' });
+    }
+
+    return c.json({ error: 'Invalid notification type' }, 400);
+  } catch (error) {
+    console.error('Test notification error:', error);
+    return c.json({ error: 'Failed to send test notification' }, 500);
+  }
+});
+
+// Send marketing campaign
+app.post('/make-server-d9a3ff0a/notifications/campaign', async (c) => {
+  try {
+    const auth = await verifyAdmin(c);
+    if (!auth.authorized) {
+      return c.json({ error: auth.error }, 401);
+    }
+
+    const { recipients, campaignData } = await c.req.json();
+
+    const results = await Promise.all(
+      recipients.map((email: string) => 
+        notificationService.sendMarketingCampaign(email, campaignData)
+      )
+    );
+
+    const successCount = results.filter(r => r).length;
+
+    return c.json({
+      success: true,
+      sent: successCount,
+      total: recipients.length,
+      message: `Campaign sent to ${successCount}/${recipients.length} recipients`
+    });
+  } catch (error) {
+    console.error('Campaign send error:', error);
+    return c.json({ error: 'Failed to send campaign' }, 500);
+  }
+});
+
+// ============================================
+// TRANSACTIONAL NOTIFICATION ROUTES
+// ============================================
+
+// Send order confirmation
+app.post('/make-server-d9a3ff0a/notifications/order/confirmation', async (c) => {
+  try {
+    const orderData = await c.req.json();
+    
+    if (!orderData.customerEmail) {
+      return c.json({ error: 'Customer email is required' }, 400);
+    }
+
+    const success = await notificationService.sendOrderConfirmation(
+      orderData.customerEmail,
+      orderData
+    );
+
+    if (success) {
+      return c.json({ success: true, message: 'Order confirmation sent' });
+    } else {
+      return c.json({ error: 'Failed to send order confirmation' }, 500);
+    }
+  } catch (error) {
+    console.error('Order confirmation error:', error);
+    return c.json({ error: 'Internal error sending order confirmation' }, 500);
+  }
+});
+
+// Send shipping notification
+app.post('/make-server-d9a3ff0a/notifications/order/shipped', async (c) => {
+  try {
+    const orderData = await c.req.json();
+    
+    if (!orderData.customerEmail) {
+      return c.json({ error: 'Customer email is required' }, 400);
+    }
+
+    const success = await notificationService.sendOrderShipped(
+      orderData.customerEmail,
+      orderData
+    );
+
+    if (success) {
+      return c.json({ success: true, message: 'Shipping notification sent' });
+    } else {
+      return c.json({ error: 'Failed to send shipping notification' }, 500);
+    }
+  } catch (error) {
+    console.error('Shipping notification error:', error);
+    return c.json({ error: 'Internal error sending shipping notification' }, 500);
+  }
+});
+
+// Send welcome email
+app.post('/make-server-d9a3ff0a/notifications/welcome', async (c) => {
+  try {
+    const { email, userName } = await c.req.json();
+    
+    if (!email || !userName) {
+      return c.json({ error: 'Email and user name are required' }, 400);
+    }
+
+    const success = await notificationService.sendWelcomeEmail(email, userName);
+
+    if (success) {
+      return c.json({ success: true, message: 'Welcome email sent' });
+    } else {
+      return c.json({ error: 'Failed to send welcome email' }, 500);
+    }
+  } catch (error) {
+    console.error('Welcome email error:', error);
+    return c.json({ error: 'Internal error sending welcome email' }, 500);
+  }
+});
+
+// Send order SMS
+app.post('/make-server-d9a3ff0a/notifications/sms/order', async (c) => {
+  try {
+    const { phone, orderNumber } = await c.req.json();
+    
+    if (!phone || !orderNumber) {
+      return c.json({ error: 'Phone and order number are required' }, 400);
+    }
+
+    const success = await notificationService.sendOrderSMS(phone, orderNumber);
+
+    if (success) {
+      return c.json({ success: true, message: 'Order SMS sent' });
+    } else {
+      return c.json({ error: 'Failed to send order SMS' }, 500);
+    }
+  } catch (error) {
+    console.error('Order SMS error:', error);
+    return c.json({ error: 'Internal error sending order SMS' }, 500);
   }
 });
 

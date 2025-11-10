@@ -1,24 +1,26 @@
-import { ShoppingBag, Search, User, Menu, X, Package, UserCircle , Shield , LogOut , Heart  } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, Package, UserCircle , Shield , LogOut , Heart } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from './AuthContext.tsx';
 import { useCart } from './CartContext.tsx';
+import { useWishlist } from './WishlistContext';
 
 
 interface HeaderProps {
-  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin';
-  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin') => void;
-  onOpenAuth: () => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout') => void;
 }
 
-export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
-  const { user, signOut } = useAuth();
+export function Header({ currentPage, onNavigate }: HeaderProps) {
+  const { user, signOut, openAuthWindow } = useAuth();
   const { getCartCount } = useCart();
-  const getWishlistCount = () => 0;
+  const { getWishlistCount, wishlist, removeFromWishlist } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const wishlistMenuRef = useRef<HTMLDivElement>(null);
+  const cartMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -27,6 +29,9 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
       }
       if (wishlistMenuRef.current && !wishlistMenuRef.current.contains(event.target as Node)) {
         setShowWishlist(false);
+      }
+      if (cartMenuRef.current && !cartMenuRef.current.contains(event.target as Node)) {
+        setShowCart(false);
       }
     }
 
@@ -55,25 +60,25 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-8">
             <button 
               onClick={() => onNavigate('home')}
-              className={`hover:opacity-60 transition-opacity ${currentPage === 'home' ? 'opacity-100' : 'opacity-60'}`}
+              className={`transition-colors ${currentPage === 'home' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
             >
               Home
             </button>
             <button 
               onClick={() => onNavigate('shop')}
-              className={`hover:opacity-60 transition-opacity ${currentPage === 'shop' ? 'opacity-100' : 'opacity-60'}`}
+              className={`transition-colors ${currentPage === 'shop' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
             >
               Shop
             </button>
             <button 
               onClick={() => onNavigate('about')}
-              className={`hover:opacity-60 transition-opacity ${currentPage === 'about' ? 'opacity-100' : 'opacity-60'}`}
+              className={`transition-colors ${currentPage === 'about' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
             >
               About
             </button>
             <button 
               onClick={() => onNavigate('contact')}
-              className={`hover:opacity-60 transition-opacity ${currentPage === 'contact' ? 'opacity-100' : 'opacity-60'}`}
+              className={`transition-colors ${currentPage === 'contact' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
             >
               Contact
             </button>
@@ -93,20 +98,47 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
               >
                 <Heart className="w-5 h-5" />
                 {getWishlistCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 -left-1 bg-white text-red-500 border-red-500 text-xs w-4 h-4 flex items-center justify-center">
                     {getWishlistCount()}
                   </span>
                 )}
               </button>
 
+
               {/* Wishlist Dropdown */}
               {showWishlist && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn">
-                  <h3 className="text-xl mb-4">Wishlist ({getWishlistCount()})</h3>
+                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                  <h3 className="text-2xl mb-6 text-red-500"> Wishlist ({getWishlistCount()})</h3>
                   {getWishlistCount() === 0 ? (
                     <p className="text-gray-500 text-center py-8">Your wishlist is empty</p>
                   ) : (
-                    <p className="text-gray-600">View your wishlist items in your account</p>
+                    <div className="space-y-4">
+                      {wishlist.map((item) => (
+                        <div key={item.productId} className="flex gap-3 pb-4 border-b border-gray-200">
+                          <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium line-clamp-1">{item.name}</h4>
+                            <p className="text-xs text-gray-500">{item.category}</p>
+                            <p className="text-sm font-bold mt-1">₹{item.price.toLocaleString()}</p>
+                          </div>
+                          <button 
+                            onClick={() => removeFromWishlist(item.productId)}
+                            className="text-red-500 hover:text-red-700 text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                      <button 
+                        onClick={() => {
+                          onNavigate('profile');
+                          setShowWishlist(false);
+                        }}
+                        className="w-full py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+                      >
+                        View All
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
@@ -177,7 +209,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                       
                       <button 
                         onClick={() => {
-                          onOpenAuth();
+                          openAuthWindow();
                           setShowAccountMenu(false);
                         }}
                         className="w-full py-4 bg-black text-white hover:bg-gray-800 transition-colors mb-4"
@@ -188,7 +220,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                       <div className="grid grid-cols-2 gap-3">
                         <button 
                           onClick={() => {
-                            onOpenAuth();
+                            openAuthWindow();
                             setShowAccountMenu(false);
                           }}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
@@ -198,7 +230,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                         </button>
                         <button 
                           onClick={() => {
-                            onOpenAuth();
+                            openAuthWindow();
                             setShowAccountMenu(false);
                           }}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
@@ -213,14 +245,42 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
               )}
             </div>
 
-            <button className="hover:opacity-60 transition-opacity relative">
-              <ShoppingBag className="w-5 h-5" />
-              {getCartCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {getCartCount()}
-                </span>
+            <div className="relative" ref={cartMenuRef}>
+              <button 
+                onClick={() => setShowCart(!showCart)}
+                className="hover:opacity-60 transition-opacity relative"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {getCartCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {getCartCount()}
+                  </span>
+                )}
+              </button>
+
+              {/* Cart Dropdown */}
+              {showCart && (
+                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                  <h3 className="text-xl mb-4">Shopping Cart ({getCartCount()} items)</h3>
+                  {getCartCount() === 0 ? (
+                    <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-sm text-gray-600">Cart items will be displayed here</p>
+                      <button 
+                        onClick={() => {
+                          setShowCart(false);
+                          // Navigate to checkout or cart page
+                        }}
+                        className="w-full py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+                      >
+                        View Cart
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
-            </button>
+            </div>
             <button 
               className="md:hidden hover:opacity-60 transition-opacity"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -239,7 +299,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                   onNavigate('home');
                   setIsMenuOpen(false);
                 }}
-                className="hover:opacity-60 transition-opacity text-left"
+                className="text-left transition-colors text-gray-500 hover:text-black"
               >
                 Home
               </button>
@@ -248,7 +308,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                   onNavigate('shop');
                   setIsMenuOpen(false);
                 }}
-                className="hover:opacity-60 transition-opacity text-left"
+                className="text-left transition-colors text-gray-500 hover:text-black"
               >
                 Shop
               </button>
@@ -257,7 +317,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                   onNavigate('about');
                   setIsMenuOpen(false);
                 }}
-                className="hover:opacity-60 transition-opacity text-left"
+                className="text-left transition-colors text-gray-500 hover:text-black"
               >
                 About
               </button>
@@ -266,7 +326,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                   onNavigate('contact');
                   setIsMenuOpen(false);
                 }}
-                className="hover:opacity-60 transition-opacity text-left"
+                className="text-left transition-colors text-gray-500 hover:text-black"
               >
                 Contact
               </button>
@@ -313,7 +373,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                   <>
                     <button 
                       onClick={() => {
-                        onOpenAuth();
+                        openAuthWindow();
                         setIsMenuOpen(false);
                       }}
                       className="w-full py-3 bg-black text-white"
@@ -323,7 +383,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                     <div className="grid grid-cols-2 gap-3">
                       <button 
                         onClick={() => {
-                          onOpenAuth();
+                          openAuthWindow();
                           setIsMenuOpen(false);
                         }}
                         className="flex items-center justify-center gap-2 py-3 border border-black"
@@ -333,7 +393,7 @@ export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
                       </button>
                       <button 
                         onClick={() => {
-                          onOpenAuth();
+                          openAuthWindow();
                           setIsMenuOpen(false);
                         }}
                         className="flex items-center justify-center gap-2 py-3 border border-black"

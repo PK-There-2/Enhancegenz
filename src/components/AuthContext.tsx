@@ -1,6 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface User {
   id: string;
@@ -16,46 +14,80 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string, adminKey?: string) => Promise<void>;
   signOut: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
+  openAuthWindow: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey
-);
+// Local storage keys
+const USER_STORAGE_KEY = 'thread_trends_user';
+const USERS_DB_KEY = 'thread_trends_users_db';
+
+// Initialize demo users if not exists
+const initializeDemoData = () => {
+  const usersDb = localStorage.getItem(USERS_DB_KEY);
+  if (!usersDb) {
+    const demoUsers = [
+      {
+        id: '1',
+        email: 'demo@threadtrends.com',
+        password: 'demo123',
+        name: 'Demo User',
+        role: 'customer' as const
+      },
+      {
+        id: '2',
+        email: 'admin@threadtrends.com',
+        password: 'admin123',
+        name: 'Admin User',
+        role: 'admin' as const
+      }
+    ];
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(demoUsers));
+    console.log('✅ Demo users initialized!');
+  }
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authWindow, setAuthWindow] = useState<Window | null>(null);
+
+  // Initialize demo data on mount
+  useEffect(() => {
+    initializeDemoData();
+  }, []);
+
+  // Listen for auth messages from popup window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // For security, you should validate event.origin in production
+      if (event.data.type === 'AUTH_SUCCESS') {
+        setUser(event.data.user);
+        if (authWindow) {
+          authWindow.close();
+          setAuthWindow(null);
+        }
+      } else if (event.data.type === 'AUTH_CLOSED') {
+        setAuthWindow(null);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [authWindow]);
 
   const getAccessToken = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || null;
+    // Mock token for local auth
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+    return storedUser ? 'mock-token-' + JSON.parse(storedUser).id : null;
   };
 
   const fetchUser = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d9a3ff0a/auth/user`,
-        {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
-        }
-      );
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
+      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
       } else {
         setUser(null);
       }
@@ -69,24 +101,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     fetchUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchUser();
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      await fetchUser();
+      // Get users database from localStorage
+      const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+      
+      // Find user by email and password
+      const user = usersDb.find((u: any) => u.email === email && u.password === password);
+      
+      if (!user) {
+        throw new Error('Invalid email or password');
+      }
+      
+      // Store user session (without password)
+      const { password: _, ...userWithoutPassword } = user;
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
+      setUser(userWithoutPassword);
     } catch (error: any) {
       console.error('Sign in error:', error);
       throw new Error(error.message || 'Failed to sign in');
@@ -95,31 +127,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string, adminKey?: string) => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d9a3ff0a/auth/signup`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            name,
-            role: adminKey ? 'admin' : 'customer',
-            adminKey
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to sign up');
+      // Get existing users
+      const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+      
+      // Check if user already exists
+      if (usersDb.find((u: any) => u.email === email)) {
+        throw new Error('User with this email already exists');
       }
-
-      // After successful signup, sign in the user
+      
+      // Create new user
+      const role: 'admin' | 'customer' = (adminKey && adminKey === 'admin123') ? 'admin' : 'customer';
+      const newUser = {
+        id: Date.now().toString(),
+        email,
+        password, // In production, this should be hashed
+        name,
+        role
+      };
+      
+      // Save to users database
+      usersDb.push(newUser);
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
+      
+      // Automatically sign in
       await signIn(email, password);
     } catch (error: any) {
       console.error('Sign up error:', error);
@@ -129,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      localStorage.removeItem(USER_STORAGE_KEY);
       setUser(null);
     } catch (error) {
       console.error('Sign out error:', error);
@@ -137,8 +167,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const openAuthWindow = () => {
+    const width = 500;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    
+    const popup = window.open(
+      '/auth.html',
+      'Thread Trends Login',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
+    
+    setAuthWindow(popup);
+    
+    // Focus the popup
+    if (popup) {
+      popup.focus();
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, getAccessToken }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, getAccessToken, openAuthWindow }}>
       {children}
     </AuthContext.Provider>
   );

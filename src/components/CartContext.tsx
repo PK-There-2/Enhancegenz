@@ -17,6 +17,7 @@ interface CartContextType {
   clearCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
+  checkout: () => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -75,6 +76,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart([]);
   };
 
+  const checkout = () => {
+    // This would normally process payment, etc.
+    // For now, just clear the cart and return success
+    if (cart.length > 0) {
+      clearCart();
+      return true;
+    }
+    return false;
+  };
+
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   const getCartCount = () => cart.reduce((count, item) => count + item.quantity, 0);
 
@@ -86,7 +97,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       clearCart,
       getCartTotal,
-      getCartCount
+      getCartCount,
+      checkout
     }}>
       {children}
     </CartContext.Provider>

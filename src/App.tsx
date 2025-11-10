@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Toaster } from './components/ui/sonner';
+import './styles/rewards-animations.css';
 import { AuthProvider } from './components/AuthContext';
 import { CartProvider } from './components/CartContext';
 import { WishlistProvider } from './components/WishlistContext.tsx';
+import { RewardsProvider } from './components/RewardsContext.tsx';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { AnimatedMarquee } from './components/AnimatedMarquee';
@@ -15,14 +17,14 @@ import { Footer } from './components/Footer';
 import { Shop } from './components/Shop';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
-import AuthModal from './components/AuthModal.tsx';
 import UserPortal from './components/UserPortal.tsx';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ProductDetail, type ProductDetailData } from './components/ProductDetail';
+import { FloatingRewardsButton } from './components/FloatingRewardsButton';
+import { Checkout } from './components/Checkout';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin'>('home');
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
 
   const navigateToShop = () => {
@@ -30,7 +32,8 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin') => {
+  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout') => {
+    setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -50,14 +53,31 @@ export default function App() {
 
   const handleBackFromProduct = () => {
     setSelectedProduct(null);
+    // Go back to shop page when clicking back
+    setCurrentPage('shop');
   };
-
   const renderPage = () => {
-    // Show product detail if a product is selected
-    if (selectedProduct) {
-      return <ProductDetail product={selectedProduct} onBack={handleBackFromProduct} />;
+    // Show checkout page
+    if (currentPage === 'checkout') {
+      return (
+        <Checkout 
+          onComplete={() => navigateToPage('home')}
+          onCancel={() => navigateToPage('shop')}
+        />
+      );
     }
 
+    // Show product detail if a product is selected
+    if (selectedProduct) {
+      return (
+        <ProductDetail 
+          product={selectedProduct} 
+          onBack={handleBackFromProduct}
+          onNavigateCheckout={() => navigateToPage('checkout')}
+        />
+      );
+    }
+  
     switch (currentPage) {
       case 'home':
         return (
@@ -78,36 +98,45 @@ export default function App() {
       case 'contact':
         return <Contact />;
       case 'profile':
-        return <UserPortal onNavigate={(page) => navigateToPage(page as any)} />;
+        // Add a wrapper div with minimum height to prevent white screen
+        return (
+          <div className="min-h-screen">
+            <UserPortal onNavigate={(page) => navigateToPage(page as any)} />
+          </div>
+        );
       case 'admin':
         return <AdminDashboard />;
       default:
         return null;
     }
   };
+  
 
-  const showFooter = !['admin'].includes(currentPage);
+  const showFooter = !['admin', 'checkout'].includes(currentPage);
+  const showFloatingRewards = !['admin', 'checkout'].includes(currentPage);
+  const showHeader = !['checkout'].includes(currentPage);
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <div className="min-h-screen bg-white">
-            <Header 
-              currentPage={currentPage} 
-              onNavigate={navigateToPage}
-              onOpenAuth={() => setIsAuthModalOpen(true)}
-            />
+      <RewardsProvider>
+        <CartProvider>
+          <WishlistProvider>
+          <div className="min-h-screen bg-white relative">
+            {showHeader && (
+              <Header 
+                currentPage={currentPage} 
+                onNavigate={navigateToPage}
+              />
+            )}
+            {showFloatingRewards && <FloatingRewardsButton />}
             {renderPage()}
             {showFooter && <Footer />}
-            <AuthModal 
-              isOpen={isAuthModalOpen}
-              onClose={() => setIsAuthModalOpen(false)}
-            />
+
             <Toaster position="top-right" richColors />
           </div>
-        </WishlistProvider>
-      </CartProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </RewardsProvider>
     </AuthProvider>
   );
 }

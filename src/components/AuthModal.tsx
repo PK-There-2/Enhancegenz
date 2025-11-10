@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   defaultMode?: 'signin' | 'signup';
 }
 
-export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onSuccess, defaultMode = 'signin' }: AuthModalProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>(defaultMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,9 +32,11 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
     try {
       if (mode === 'signin') {
         await signIn(email, password);
+        onSuccess?.();
         onClose();
       } else {
         await signUp(email, password, name, showAdminField ? adminKey : undefined);
+        onSuccess?.();
         onClose();
       }
     } catch (err: any) {
@@ -56,8 +60,8 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
     resetForm();
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="relative inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-6">
       <div className="bg-white max-w-md w-full shadow-2xl relative">
         {/* Close Button */}
         <button
@@ -204,14 +208,21 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
         <div className="px-8 pb-8">
           <div className="bg-blue-50 border border-blue-200 p-4">
             <p className="text-xs text-blue-800">
-              <strong>Demo Mode:</strong> You can create an account or use demo credentials:
+              <strong>Local Storage Mode (No Database):</strong>
               <br />
-              <span className="font-mono">demo@threadtrends.com / demo123</span>
+              Demo Credentials:
+              <br />
+              <span className="font-mono">Customer: demo@threadtrends.com / demo123</span>
+              <br />
+              <span className="font-mono">Admin: admin@threadtrends.com / admin123</span>
+              <br />
+              <span className="text-[10px] mt-1 block">Or create your own account!</span>
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
