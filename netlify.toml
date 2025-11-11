@@ -18,10 +18,4 @@
   to = "/checkout.html"
   status = 200
 
-# Catch-all for SPA routes LAST
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 
