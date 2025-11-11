@@ -17,7 +17,6 @@ import { Footer } from './components/Footer';
 import { Shop } from './components/Shop';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
-import AuthModal from './components/AuthModal.tsx';
 import UserPortal from './components/UserPortal.tsx';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ProductDetail, type ProductDetailData } from './components/ProductDetail';
@@ -27,7 +26,6 @@ import { Checkout } from './components/Checkout';
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const navigateToShop = () => {
     setCurrentPage('shop');
@@ -128,27 +126,11 @@ export default function App() {
               <Header 
                 currentPage={currentPage} 
                 onNavigate={navigateToPage}
-                onOpenAuth={() => setIsAuthModalOpen(true)}
               />
             )}
             {showFloatingRewards && <FloatingRewardsButton />}
             {renderPage()}
             {showFooter && <Footer />}
-
-            <AuthModal 
-              isOpen={isAuthModalOpen}
-              onClose={() => setIsAuthModalOpen(false)}
-              onSuccess={() => {
-                setIsAuthModalOpen(false);
-                // Ensure body overflow is reset
-                document.body.style.overflow = '';
-                document.body.classList.remove('modal-open');
-                // Navigate to profile
-                setTimeout(() => {
-                  navigateToPage('profile');
-                }, 50);
-              }}
-            />
 
             <Toaster position="top-right" richColors />
           </div>
