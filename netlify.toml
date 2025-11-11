@@ -4,17 +4,17 @@
 
 # Serve the real static files first
 [[redirects]]
-  from = "/*"
+  from = "auth"
   to = "/auth.html"
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "rewards"
   to = "/rewards.html"
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "checkout"
   to = "/checkout.html"
   status = 200
 
