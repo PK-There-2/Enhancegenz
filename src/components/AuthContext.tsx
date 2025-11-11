@@ -168,23 +168,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const openAuthWindow = () => {
-    const width = 500;
-    const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
-    const popup = window.open(
-      '/auth.html',
-      'Thread Trends Login',
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-    );
-    
-    setAuthWindow(popup);
-    
-    // Focus the popup
-    if (popup) {
-      popup.focus();
-    }
+    // Modal is now handled by AuthModal component in App.tsx
+    // This function is kept for backwards compatibility
+    // Header should use the onOpenAuth prop to open the modal
+    console.log('openAuthWindow called - modal is handled by App.tsx');
   };
 
   return (

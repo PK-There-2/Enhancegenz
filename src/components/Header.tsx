@@ -8,10 +8,11 @@ import { useWishlist } from './WishlistContext';
 interface HeaderProps {
   currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout';
   onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout') => void;
+  onOpenAuth?: () => void;
 }
 
-export function Header({ currentPage, onNavigate }: HeaderProps) {
-  const { user, signOut, openAuthWindow } = useAuth();
+export function Header({ currentPage, onNavigate, onOpenAuth }: HeaderProps) {
+  const { user, signOut } = useAuth();
   const { getCartCount } = useCart();
   const { getWishlistCount, wishlist, removeFromWishlist } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -209,7 +210,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                       
                       <button 
                         onClick={() => {
-                          openAuthWindow();
+                          onOpenAuth?.();
                           setShowAccountMenu(false);
                         }}
                         className="w-full py-4 bg-black text-white hover:bg-gray-800 transition-colors mb-4"
@@ -220,7 +221,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                       <div className="grid grid-cols-2 gap-3">
                         <button 
                           onClick={() => {
-                            openAuthWindow();
+                            onOpenAuth?.();
                             setShowAccountMenu(false);
                           }}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
@@ -230,7 +231,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                         </button>
                         <button 
                           onClick={() => {
-                            openAuthWindow();
+                            onOpenAuth?.();
                             setShowAccountMenu(false);
                           }}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
@@ -373,7 +374,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                   <>
                     <button 
                       onClick={() => {
-                        openAuthWindow();
+                        onOpenAuth?.();
                         setIsMenuOpen(false);
                       }}
                       className="w-full py-3 bg-black text-white"
@@ -383,7 +384,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                     <div className="grid grid-cols-2 gap-3">
                       <button 
                         onClick={() => {
-                          openAuthWindow();
+                          onOpenAuth?.();
                           setIsMenuOpen(false);
                         }}
                         className="flex items-center justify-center gap-2 py-3 border border-black"
@@ -393,7 +394,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                       </button>
                       <button 
                         onClick={() => {
-                          openAuthWindow();
+                          onOpenAuth?.();
                           setIsMenuOpen(false);
                         }}
                         className="flex items-center justify-center gap-2 py-3 border border-black"
