@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createRoot } from "react-dom/client";
+import AuthWindow from './AuthWindow';
 
 interface User {
   id: string;
@@ -19,32 +21,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Local storage keys
+// Local Storage Keys
 const USER_STORAGE_KEY = 'thread_trends_user';
 const USERS_DB_KEY = 'thread_trends_users_db';
 
-// Initialize demo users if not exists
+// Initialize demo accounts
 const initializeDemoData = () => {
   const usersDb = localStorage.getItem(USERS_DB_KEY);
   if (!usersDb) {
     const demoUsers = [
-      {
-        id: '1',
-        email: 'demo@threadtrends.com',
-        password: 'demo123',
-        name: 'Demo User',
-        role: 'customer' as const
-      },
-      {
-        id: '2',
-        email: 'admin@threadtrends.com',
-        password: 'admin123',
-        name: 'Admin User',
-        role: 'admin' as const
-      }
+      { id: '1', email: 'demo@threadtrends.com', password: 'demo123', name: 'Demo User', role: 'customer' as const },
+      { id: '2', email: 'admin@threadtrends.com', password: 'admin123', name: 'Admin User', role: 'admin' as const }
     ];
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(demoUsers));
-    console.log('✅ Demo users initialized!');
+    console.log('✅ Demo users initialized');
   }
 };
 
@@ -53,15 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [authWindow, setAuthWindow] = useState<Window | null>(null);
 
-  // Initialize demo data on mount
   useEffect(() => {
     initializeDemoData();
   }, []);
 
-  // Listen for auth messages from popup window
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // For security, you should validate event.origin in production
       if (event.data.type === 'AUTH_SUCCESS') {
         setUser(event.data.user);
         if (authWindow) {
@@ -75,28 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [authWindow, setUser]);
-
-  const getAccessToken = async () => {
-    // Mock token for local auth
-    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
-    return storedUser ? 'mock-token-' + JSON.parse(storedUser).id : null;
-  };
+  }, [authWindow]);
 
   const fetchUser = async () => {
-    try {
-      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    setUser(stored ? JSON.parse(stored) : null);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -104,87 +75,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      // Get users database from localStorage
-      const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-      
-      // Find user by email and password
-      const user = usersDb.find((u: any) => u.email === email && u.password === password);
-      
-      if (!user) {
-        throw new Error('Invalid email or password');
-      }
-      
-      // Store user session (without password)
-      const { password: _, ...userWithoutPassword } = user;
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userWithoutPassword));
-      setUser(userWithoutPassword);
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      throw new Error(error.message || 'Failed to sign in');
-    }
+    const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+    const found = usersDb.find((u: any) => u.email === email && u.password === password);
+
+    if (!found) throw new Error('Invalid email or password');
+
+    const { password: _, ...publicUser } = found;
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(publicUser));
+    setUser(publicUser);
   };
 
   const signUp = async (email: string, password: string, name: string, adminKey?: string) => {
-    try {
-      // Get existing users
-      const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-      
-      // Check if user already exists
-      if (usersDb.find((u: any) => u.email === email)) {
-        throw new Error('User with this email already exists');
-      }
-      
-      // Create new user
-      const role: 'admin' | 'customer' = (adminKey && adminKey === 'admin123') ? 'admin' : 'customer';
-      const newUser = {
-        id: Date.now().toString(),
-        email,
-        password, // In production, this should be hashed
-        name,
-        role
-      };
-      
-      // Save to users database
-      usersDb.push(newUser);
-      localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
-      
-      // Automatically sign in
-      await signIn(email, password);
-    } catch (error: any) {
-      console.error('Sign up error:', error);
-      throw new Error(error.message || 'Failed to sign up');
-    }
+    const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+
+    if (usersDb.find((u: any) => u.email === email)) throw new Error('User already exists');
+
+    const role: 'admin' | 'customer' = adminKey === 'admin123' ? 'admin' : 'customer';
+    const newUser = { id: Date.now().toString(), email, password, name, role };
+
+    usersDb.push(newUser);
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
+
+    await signIn(email, password);
   };
 
   const signOut = async () => {
-    try {
-      localStorage.removeItem(USER_STORAGE_KEY);
-      setUser(null);
-    } catch (error) {
-      console.error('Sign out error:', error);
-      throw error;
-    }
+    localStorage.removeItem(USER_STORAGE_KEY);
+    setUser(null);
   };
 
+  const getAccessToken = async () => {
+    const stored = localStorage.getItem(USER_STORAGE_KEY);
+    return stored ? 'mock-token-' + JSON.parse(stored).id : null;
+  };
+
+  // ✅ Popup Logic (React inside popup)
   const openAuthWindow = () => {
     const width = 500;
     const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
+
     const popup = window.open(
-      'public/auth.html',
-      'Thread Trends Login',
+      "",
+      "Thread Trends Login",
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
-    
+
+    if (!popup) return;
     setAuthWindow(popup);
-    
-    // Focus the popup
-    if (popup) {
-      popup.focus();
-    }
+
+    popup.document.title = "Thread Trends Login";
+
+    const container = popup.document.createElement("div");
+    popup.document.body.appendChild(container);
+
+    // ✅ Inject compiled Tailwind CSS
+    const style = popup.document.createElement("link");
+    style.rel = "stylesheet";
+    style.href = "/index.css"; // IMPORTANT: Vite bundles to /index.css in dist
+    popup.document.head.appendChild(style);
+
+    const root = createRoot(container);
+    root.render(<AuthWindow />);
+
+    popup.focus();
   };
 
   return (
@@ -195,9 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+  return ctx;
 }
