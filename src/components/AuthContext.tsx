@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [authWindow]);
+  }, [authWindow, setUser]);
 
   const getAccessToken = async () => {
     // Mock token for local auth
