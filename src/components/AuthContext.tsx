@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const top = window.screen.height / 2 - height / 2;
     
     const popup = window.open(
-      '/auth.html',
+      'public/auth.html',
       'Thread Trends Login',
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
