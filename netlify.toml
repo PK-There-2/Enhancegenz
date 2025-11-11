@@ -2,20 +2,5 @@
   command = "npm ci && npm run build"
   publish = "build"
 
-# Serve the real static files first
-[[redirects]]
-  from = "auth"
-  to = "/auth.html"
-  status = 200
-
-[[redirects]]
-  from = "rewards"
-  to = "/rewards.html"
-  status = 200
-
-[[redirects]]
-  from = "checkout"
-  to = "/checkout.html"
-  status = 200
 
 
