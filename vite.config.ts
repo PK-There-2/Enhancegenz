@@ -57,4 +57,6 @@
       port: 3000,
       open: true,
     },
+    // Add this to copy static files
+  publicDir: 'public',
   });
