@@ -17,10 +17,26 @@ export function Footer() {
           <div>
             <h4 className="mb-4">Shop</h4>
             <ul className="space-y-2 text-sm text-white/60">
-              <li><a href="#" className="hover:text-white transition-colors">New Arrivals</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Best Sellers</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">T-Shirts</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Hoodies</a></li>
+            {/* <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: { page: 'home', scrollTo: 'best-sellers' } });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">New Arrivals</a></li> */}
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: { page: 'home', scrollTo: 'best-sellers' } });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Best Sellers</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: { page: 'shop', filter: 'tshirts' } });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">T-Shirts</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: { page: 'shop', filter: 'hoodies' } });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Hoodies</a></li>
             </ul>
           </div>
 
@@ -31,7 +47,11 @@ export function Footer() {
               <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Size Guide</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: 'contact' });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Contact Us</a></li>
             </ul>
           </div>
 

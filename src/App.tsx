@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from './components/ui/sonner';
 import './styles/rewards-animations.css';
 import { AuthProvider } from './components/AuthContext';
@@ -25,7 +25,45 @@ import { Checkout } from './components/Checkout';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout'>('home');
+
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
+
+  // Handle navigation events from components like Footer
+  const handleNavigation = (event: CustomEvent) => {
+    const detail = event.detail;
+    
+    // Handle simple page navigation
+    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout'].includes(detail)) {
+      navigateToPage(detail as any);
+      return;
+    }
+    
+    // Handle complex navigation with scroll/filter
+    if (typeof detail === 'object' && detail !== null) {
+      const { page, scrollTo, filter } = detail;
+      
+      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout'].includes(page)) {
+        navigateToPage(page as any);
+        
+        // Handle scroll to section
+        if (scrollTo && page === 'home') {
+          setTimeout(() => {
+            const element = document.getElementById(scrollTo);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
+        }
+        
+        // Handle shop filtering
+        if (filter && page === 'shop') {
+          // We'll need to pass filter info to the Shop component
+          // This will be handled by setting state in the App component
+          window.dispatchEvent(new CustomEvent('shopFilter', { detail: filter }));
+        }
+      }
+    }
+  };
 
   const navigateToShop = () => {
     setCurrentPage('shop');
@@ -115,6 +153,14 @@ export default function App() {
   const showFooter = !['admin', 'checkout'].includes(currentPage);
   const showFloatingRewards = !['admin', 'checkout'].includes(currentPage);
   const showHeader = !['checkout'].includes(currentPage);
+
+  // Add event listener for navigation events
+  useEffect(() => {
+    window.addEventListener('navigate', handleNavigation as EventListener);
+    return () => {
+      window.removeEventListener('navigate', handleNavigation as EventListener);
+    };
+  }, []);
 
   return (
     <AuthProvider>

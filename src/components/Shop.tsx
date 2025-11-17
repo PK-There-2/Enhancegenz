@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 
@@ -127,6 +127,23 @@ interface ShopProps { onOpenProduct: (product: any) => void }
 
 export function Shop({ onOpenProduct }: ShopProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
+  
+  // Handle filter events from navigation
+  useEffect(() => {
+    const handleShopFilter = (event: CustomEvent) => {
+      const filter = event.detail;
+      if (filter === 'tshirts') {
+        setSelectedCategories(['tshirts']);
+      } else if (filter === 'hoodies') {
+        setSelectedCategories(['hoodies']);
+      }
+    };
+    
+    window.addEventListener('shopFilter', handleShopFilter as EventListener);
+    return () => {
+      window.removeEventListener('shopFilter', handleShopFilter as EventListener);
+    };
+  }, []);
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('featured');
