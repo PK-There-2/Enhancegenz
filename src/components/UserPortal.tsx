@@ -1,10 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { User, Package, Heart, Settings, LogOut, ShoppingBag } from 'lucide-react';
+import { useCart } from './CartContext';
+import { useWishlist } from './WishlistContext';
+import { User, Package, Heart, Settings, LogOut, ShoppingBag, Trash2 } from 'lucide-react';
 
 export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void }) {
   const { user, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist'>('profile');
+  const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
+  const { wishlist, removeFromWishlist } = useWishlist();
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'cart'>('profile');
+
+  // Listen for navigate-to-cart event from header
+  useEffect(() => {
+    const handleNavigateToCart = () => {
+      setActiveTab('cart');
+    };
+    
+    window.addEventListener('navigate-to-cart', handleNavigateToCart);
+    return () => window.removeEventListener('navigate-to-cart', handleNavigateToCart);
+  }, []);
 
   if (!user) {
     return (
@@ -98,7 +112,18 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
                   }`}
                 >
                   <Heart className="w-5 h-5" />
-                  <span>Wishlist</span>
+                  <span>Wishlist ({wishlist.length})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('cart')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 mb-2 transition-colors ${
+                    activeTab === 'cart'
+                      ? 'bg-black text-white'
+                      : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span>My Cart ({cart.length})</span>
                 </button>
                 <button
                   onClick={() => signOut()}
@@ -114,7 +139,7 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
           {/* Main Content */}
           <div className="lg:col-span-3">
             {activeTab === 'profile' && (
-              <div className="bg-white shadow-sm p-6">
+              <div className="bg-white shadow-sm p-6 rounded-lg">
                 <h2 className="text-2xl mb-6">Profile Information</h2>
                 <div className="space-y-6">
                   <div>
@@ -149,7 +174,7 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
             )}
 
             {activeTab === 'orders' && (
-              <div className="bg-white shadow-sm p-6">
+              <div className="bg-white shadow-sm p-6 rounded-lg">
                 <h2 className="text-2xl mb-6">My Orders</h2>
                 <div className="text-center py-12">
                   <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -165,18 +190,117 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
             )}
 
             {activeTab === 'wishlist' && (
-              <div className="bg-white shadow-sm p-6">
+              <div className="bg-white shadow-sm p-6 rounded-lg">
                 <h2 className="text-2xl mb-6">My Wishlist</h2>
-                <div className="text-center py-12">
-                  <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">Your wishlist is empty</p>
-                  <button
-                    onClick={() => onNavigate('shop')}
-                    className="px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
-                  >
-                    Browse Products
-                  </button>
-                </div>
+                {wishlist.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">Your wishlist is empty</p>
+                    <button
+                      onClick={() => onNavigate('shop')}
+                      className="px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
+                    >
+                      Browse Products
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {wishlist.map((item) => (
+                      <div key={item.productId} className="border border-gray-200 p-4 relative">
+                        <button
+                          onClick={() => removeFromWishlist(item.productId)}
+                          className="absolute top-2 right-2 p-2 hover:bg-red-50 text-red-600 transition-colors rounded-full"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <img src={item.image} alt={item.name} className="w-full h-48 object-cover mb-4" />
+                        <h3 className="font-medium mb-2 line-clamp-2">{item.name}</h3>
+                        <p className="text-sm text-gray-600 mb-2">{item.category}</p>
+                        <p className="text-lg font-bold">₹{item.price.toLocaleString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'cart' && (
+              <div className="bg-white shadow-sm p-8 rounded-lg max-w-4xl">
+                <h2 className="text-2xl mb-6">My Cart</h2>
+                {cart.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">Your cart is empty</p>
+                    <button
+                      onClick={() => onNavigate('shop')}
+                      className="px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
+                    >
+                      Start Shopping
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-6 mb-6">
+                      {cart.map((item) => (
+                        <div key={`${item.productId}-${item.size}`} className="flex gap-4 pb-6 border-b border-gray-200 last:border-0">
+                          <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex-1 pr-4">
+                                <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{item.name}</h3>
+                                <p className="text-sm text-gray-600">Size: {item.size}</p>
+                              </div>
+                              <button
+                                onClick={() => removeFromCart(item.productId, item.size)}
+                                className="p-2 hover:bg-gray-100 text-gray-400 hover:text-red-600 transition-colors rounded-full flex-shrink-0"
+                                title="Remove item"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                            <div className="flex items-center justify-between mt-3">
+                              <p className="text-lg font-bold text-gray-900">₹{item.price.toLocaleString()}</p>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+                                  className="px-4 py-2 hover:bg-gray-50 transition-colors text-gray-600"
+                                  disabled={item.quantity <= 1}
+                                >
+                                  −
+                                </button>
+                                <span className="px-4 py-2 min-w-[50px] text-center font-medium border-x border-gray-300">{item.quantity}</span>
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                                  className="px-4 py-2 hover:bg-gray-50 transition-colors text-gray-600"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border-t border-gray-300 pt-6">
+                      <div className="flex justify-between items-center mb-6">
+                        <span className="text-xl font-medium text-gray-900">Total:</span>
+                        <span className="text-3xl font-bold text-gray-900">₹{getCartTotal().toLocaleString()}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          // Dispatch event to set checkout source as 'cart'
+                          window.dispatchEvent(new CustomEvent('checkout-from-cart'));
+                          onNavigate('checkout');
+                        }}
+                        className="w-full py-4 bg-black text-white font-semibold hover:bg-gray-800 transition-colors rounded-lg"
+                      >
+                        Proceed to Checkout
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

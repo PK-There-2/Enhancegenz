@@ -61,8 +61,8 @@ export function AuthModal({ isOpen, onClose, onSuccess, defaultMode = 'signin' }
   };
 
   return createPortal(
-    <div className="relative inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-6">
-      <div className="bg-white max-w-md w-full shadow-2xl relative">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-6">
+      <div className="bg-white max-w-md w-full shadow-2xl relative rounded-2xl overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}

@@ -86,12 +86,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string, adminKey?: string) => {
+    if (!name || name.trim().length === 0) {
+      throw new Error('Please enter your full name');
+    }
+    
     const usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
 
     if (usersDb.find((u: any) => u.email === email)) throw new Error('User already exists');
 
     const role: 'admin' | 'customer' = adminKey === 'admin123' ? 'admin' : 'customer';
-    const newUser = { id: Date.now().toString(), email, password, name, role };
+    const newUser = { id: Date.now().toString(), email, password, name: name.trim(), role };
 
     usersDb.push(newUser);
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));

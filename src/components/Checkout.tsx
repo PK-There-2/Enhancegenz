@@ -23,7 +23,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
   const { user } = useAuth();
   const { earnPoints } = useRewards();
   const [step, setStep] = useState<'shipping' | 'confirmation'>('shipping');
-  const [policy, setPolicy] = useState<null | 'refund' | 'privacy' | 'contact'>(null);
+  const [policy, setPolicy] = useState<null | 'privacy' | 'contact'>(null);
   const [orderData] = useState<OrderData>(() => {
     const stored = localStorage.getItem('thread_trends_checkout_data');
     return stored ? JSON.parse(stored) : { items: [], total: 0 };
@@ -151,6 +151,21 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
   if (step === 'confirmation') {
     return (
       <div className="min-h-screen bg-gray-50">
+        {/* Back to Shop Button - Fixed Position */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <button
+              onClick={onComplete}
+              className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Return to Shop</span>
+            </button>
+          </div>
+        </div>
+        
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           {/* Success Header */}
           <div className="text-center mb-12 pb-8 border-b border-gray-200 bg-white rounded-xl shadow-sm p-8">
@@ -239,9 +254,12 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
           {/* Action Button */}
           <button
             onClick={onComplete}
-            className="w-full py-4 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm"
+            className="w-full py-4 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm inline-flex items-center justify-center gap-2"
           >
-            Continue Shopping
+            <span>Continue Shopping</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       </div>
@@ -250,6 +268,21 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Back to Shop Button - Fixed Position */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <button
+            onClick={onCancel}
+            className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Return to Shop</span>
+          </button>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
@@ -609,7 +642,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
               {/* Links row */}
               <div className="mt-6 pt-4 border-t">
                 <div className="flex items-center gap-6 text-sm">
-                  <button onClick={() => setPolicy('refund')} className="text-blue-600 hover:underline">
+                  <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'refund-policy' }))} className="text-blue-600 hover:underline">
                     Refund policy
                   </button>
                   <button onClick={() => setPolicy('privacy')} className="text-blue-600 hover:underline">
@@ -635,7 +668,6 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                   <div className="relative bg-white w-full max-w-lg mx-4 rounded-xl shadow-xl p-6">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        {policy === 'refund' && 'Refund policy'}
                         {policy === 'privacy' && 'Privacy policy'}
                         {policy === 'contact' && 'Contact'}
                       </h3>
@@ -649,14 +681,6 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                     </div>
 
                     <div className="text-sm text-gray-700 space-y-3 max-h-80 overflow-y-auto">
-                      {policy === 'refund' && (
-                        <>
-                          <p>We accept returns within 7 days of delivery for unused items in original packaging.</p>
-                          <p>Refunds are processed to the original payment method within 3–5 business days after inspection.</p>
-                          <p>Shipping fees are non-refundable. To start a return, contact support with your order number.</p>
-                        </>
-                      )}
-
                       {policy === 'privacy' && (
                         <>
                           <p>We collect only the data needed to fulfill your order and improve our service.</p>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Toaster } from './components/ui/sonner';
 import './styles/rewards-animations.css';
 import { AuthProvider } from './components/AuthContext';
-import { CartProvider } from './components/CartContext';
+import { CartProvider, useCart } from './components/CartContext';
 import { WishlistProvider } from './components/WishlistContext.tsx';
 import { RewardsProvider } from './components/RewardsContext.tsx';
 import { Header } from './components/Header';
@@ -22,18 +22,34 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { ProductDetail, type ProductDetailData } from './components/ProductDetail';
 import { FloatingRewardsButton } from './components/FloatingRewardsButton';
 import { Checkout } from './components/Checkout';
+import { RefundPolicy } from './components/RefundPolicy';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout'>('home');
+  return (
+    <AuthProvider>
+      <RewardsProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <AppContent />
+          </WishlistProvider>
+        </CartProvider>
+      </RewardsProvider>
+    </AuthProvider>
+  );
+}
 
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
+  const [checkoutSource, setCheckoutSource] = useState<'cart' | 'buynow'>('cart');
+  const { addToCart, cart, clearCart } = useCart();
 
   // Handle navigation events from components like Footer
   const handleNavigation = (event: CustomEvent) => {
     const detail = event.detail;
     
     // Handle simple page navigation
-    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout'].includes(detail)) {
+    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy'].includes(detail)) {
       navigateToPage(detail as any);
       return;
     }
@@ -42,7 +58,7 @@ export default function App() {
     if (typeof detail === 'object' && detail !== null) {
       const { page, scrollTo, filter } = detail;
       
-      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout'].includes(page)) {
+      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy'].includes(page)) {
         navigateToPage(page as any);
         
         // Handle scroll to section
@@ -70,7 +86,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout') => {
+  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy') => {
     setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -94,15 +110,70 @@ export default function App() {
     // Go back to shop page when clicking back
     setCurrentPage('shop');
   };
+
+  const handleAddToCart = (item: { product: ProductDetailData; size: string; qty: number }) => {
+    addToCart({
+      productId: String(item.product.id),
+      name: item.product.name,
+      price: item.product.price,
+      image: item.product.image,
+      size: item.size,
+    });
+    
+    // Show success toast/notification
+    alert(`Added ${item.qty} x ${item.product.name} (Size: ${item.size}) to cart!`);
+  };
+
   const renderPage = () => {
     // Show checkout page
     if (currentPage === 'checkout') {
+      // Only prepare cart data if checkout source is 'cart'
+      // For 'buynow', the ProductDetail component already set the checkout data
+      if (checkoutSource === 'cart') {
+        // Prepare checkout data from cart
+        const checkoutData = {
+          items: cart.map(item => ({
+            id: parseInt(item.productId),
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            size: item.size,
+            quantity: item.quantity
+          })),
+          total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        };
+        
+        // Save to localStorage for Checkout component
+        localStorage.setItem('thread_trends_checkout_data', JSON.stringify(checkoutData));
+      }
+      
       return (
         <Checkout 
-          onComplete={() => navigateToPage('home')}
-          onCancel={() => navigateToPage('shop')}
+          onComplete={() => {
+            // Only clear cart if checkout was from cart
+            if (checkoutSource === 'cart') {
+              clearCart();
+            }
+            setCheckoutSource('cart'); // Reset for next checkout
+            navigateToPage('home');
+          }}
+          onCancel={() => {
+            // Navigate to profile cart section if from cart, otherwise to shop
+            if (checkoutSource === 'cart') {
+              window.dispatchEvent(new CustomEvent('navigate-to-cart'));
+              navigateToPage('profile');
+            } else {
+              setCurrentPage('shop');
+            }
+            setCheckoutSource('cart'); // Reset for next checkout
+          }}
         />
       );
+    }
+    
+    // Show refund policy page
+    if (currentPage === 'refund-policy') {
+      return <RefundPolicy onBack={() => window.history.back()} />;
     }
 
     // Show product detail if a product is selected
@@ -111,7 +182,11 @@ export default function App() {
         <ProductDetail 
           product={selectedProduct} 
           onBack={handleBackFromProduct}
-          onNavigateCheckout={() => navigateToPage('checkout')}
+          onAddToCart={handleAddToCart}
+          onNavigateCheckout={() => {
+            setCheckoutSource('buynow');
+            navigateToPage('checkout');
+          }}
         />
       );
     }
@@ -157,32 +232,32 @@ export default function App() {
   // Add event listener for navigation events
   useEffect(() => {
     window.addEventListener('navigate', handleNavigation as EventListener);
+    
+    // Listen for checkout-from-cart event
+    const handleCheckoutFromCart = () => {
+      setCheckoutSource('cart');
+    };
+    window.addEventListener('checkout-from-cart', handleCheckoutFromCart);
+    
     return () => {
       window.removeEventListener('navigate', handleNavigation as EventListener);
+      window.removeEventListener('checkout-from-cart', handleCheckoutFromCart);
     };
   }, []);
 
   return (
-    <AuthProvider>
-      <RewardsProvider>
-        <CartProvider>
-          <WishlistProvider>
-          <div className="min-h-screen bg-white relative">
-            {showHeader && (
-              <Header 
-                currentPage={currentPage} 
-                onNavigate={navigateToPage}
-              />
-            )}
-            {showFloatingRewards && <FloatingRewardsButton />}
-            {renderPage()}
-            {showFooter && <Footer />}
+    <div className="min-h-screen bg-white relative">
+      {showHeader && (
+        <Header 
+          currentPage={currentPage} 
+          onNavigate={navigateToPage}
+        />
+      )}
+      {showFloatingRewards && <FloatingRewardsButton />}
+      {renderPage()}
+      {showFooter && <Footer />}
 
-            <Toaster position="top-right" richColors />
-          </div>
-          </WishlistProvider>
-        </CartProvider>
-      </RewardsProvider>
-    </AuthProvider>
+      <Toaster position="top-right" richColors />
+    </div>
   );
 }

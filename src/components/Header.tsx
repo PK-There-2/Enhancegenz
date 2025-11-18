@@ -6,8 +6,8 @@ import { useWishlist } from './WishlistContext';
 
 
 interface HeaderProps {
-  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout';
-  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout') => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy') => void;
 }
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -270,7 +270,9 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                       <button 
                         onClick={() => {
                           setShowCart(false);
-                          // Navigate to checkout or cart page
+                          // Navigate to profile cart section
+                          window.dispatchEvent(new CustomEvent('navigate-to-cart'));
+                          onNavigate('profile');
                         }}
                         className="w-full py-2 bg-black text-white hover:bg-gray-800 transition-colors"
                       >
