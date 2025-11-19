@@ -44,6 +44,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
   const [checkoutSource, setCheckoutSource] = useState<'cart' | 'buynow'>('cart');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const { addToCart, cart, clearCart } = useCart();
 
   // Handle navigation events from components like Footer
@@ -91,7 +92,15 @@ function AppContent() {
   const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page') => {
     setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
+    // Clear search query when navigating away from shop
+    if (page !== 'shop') {
+      setSearchQuery('');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
   const handleOpenProduct = (product: any) => {
@@ -199,6 +208,7 @@ function AppContent() {
             setCheckoutSource('buynow');
             navigateToPage('checkout');
           }}
+          onOpenProduct={handleOpenProduct}
         />
       );
     }
@@ -217,7 +227,7 @@ function AppContent() {
           </>
         );
       case 'shop':
-        return <Shop onOpenProduct={handleOpenProduct} />;
+        return <Shop onOpenProduct={handleOpenProduct} searchQuery={searchQuery} />;
       case 'about':
         return <About />;
       case 'contact':
@@ -263,6 +273,7 @@ function AppContent() {
         <Header 
           currentPage={currentPage} 
           onNavigate={navigateToPage}
+          onSearch={handleSearch}
         />
       )}
       {showFloatingRewards && <FloatingRewardsButton />}

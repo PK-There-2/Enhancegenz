@@ -8,9 +8,10 @@ import { useWishlist } from './WishlistContext';
 interface HeaderProps {
   currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page';
   onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page') => void;
+  onSearch?: (query: string) => void;
 }
 
-export function Header({ currentPage, onNavigate }: HeaderProps) {
+export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
   const { user, signOut, openAuthWindow } = useAuth();
   const { getCartCount } = useCart();
   const { getWishlistCount, wishlist, removeFromWishlist } = useWishlist();
@@ -18,9 +19,12 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const wishlistMenuRef = useRef<HTMLDivElement>(null);
   const cartMenuRef = useRef<HTMLDivElement>(null);
+  const searchMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -33,11 +37,25 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
       if (cartMenuRef.current && !cartMenuRef.current.contains(event.target as Node)) {
         setShowCart(false);
       }
+      if (searchMenuRef.current && !searchMenuRef.current.contains(event.target as Node)) {
+        setShowSearch(false);
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      onNavigate('shop');
+      if (onSearch) {
+        onSearch(searchQuery);
+      }
+      setShowSearch(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
@@ -86,9 +104,40 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <button className="hover:opacity-60 transition-opacity hidden sm:block">
-              <Search className="w-5 h-5" />
-            </button>
+            {/* Search */}
+            <div className="relative hidden sm:block" ref={searchMenuRef}>
+              <button 
+                onClick={() => setShowSearch(!showSearch)}
+                className="hover:opacity-60 transition-opacity"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
+              {/* Search Dropdown */}
+              {showSearch && (
+                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                  <h3 className="text-xl mb-4 text-gray-900">Search Products</h3>
+                  <form onSubmit={handleSearch}>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for products..."
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900"
+                        autoFocus
+                      />
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-white text-black border-2 border-black rounded-lg hover:bg-black hover:text-white transition-colors font-medium"
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
             
             {/* Wishlist Dropdown */}
             <div className="relative hidden sm:block" ref={wishlistMenuRef}>

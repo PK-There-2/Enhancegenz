@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useAuth } from './AuthContext';
+
+const PRODUCTS_STORAGE_KEY = 'thread_trends_products';
 
 export interface ProductDetailData {
   id: number;
@@ -18,12 +20,32 @@ interface ProductDetailProps {
   onBack: () => void;
   onAddToCart?: (item: { product: ProductDetailData; size: string; qty: number }) => void;
   onNavigateCheckout?: () => void;
+  onOpenProduct?: (product: any) => void;
 }
 
-export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout }: ProductDetailProps) {
+export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout, onOpenProduct }: ProductDetailProps) {
   const [activeSize, setActiveSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL'>('S');
   const [qty, setQty] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const { user, openAuthWindow } = useAuth();
+
+  // Load related products from localStorage
+  useEffect(() => {
+    try {
+      const storedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+      if (storedProducts) {
+        const allProducts = JSON.parse(storedProducts);
+        // Filter out the current product and get up to 4 random products
+        const filtered = allProducts.filter((p: any) => p.id !== product.id.toString() && p.id !== product.id);
+        
+        // Shuffle and get 4 random products
+        const shuffled = filtered.sort(() => 0.5 - Math.random());
+        setRelatedProducts(shuffled.slice(0, 4));
+      }
+    } catch (error) {
+      console.error('Error loading related products:', error);
+    }
+  }, [product.id]);
 
   const handleBuyNow = () => {
     if (!user) {
@@ -168,14 +190,21 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
         </div>
 
         {/* You May Also Like */}
-        <div className="mt-24">
-          <h2 className="text-2xl font-normal mb-8 text-gray-900">You may also like</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <ProductCard key={i} {...product} id={product.id} />
-            ))}
+        {relatedProducts.length > 0 && (
+          <div className="mt-24">
+            <h2 className="text-2xl font-normal mb-8 text-gray-900">You may also like</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard 
+                  key={relatedProduct.id} 
+                  {...relatedProduct} 
+                  id={relatedProduct.id}
+                  onClick={() => onOpenProduct && onOpenProduct(relatedProduct)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* FAQ */}
         

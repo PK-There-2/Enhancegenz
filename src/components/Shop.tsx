@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 
+const PRODUCTS_STORAGE_KEY = 'thread_trends_products';
+
 // Sample product data
-const products = [
+const defaultProducts = [
   // ... same as before
   {
     id: 1,
@@ -123,10 +125,56 @@ const products = [
   }
 ];
 
-interface ShopProps { onOpenProduct: (product: any) => void }
+interface ShopProps { 
+  onOpenProduct: (product: any) => void;
+  searchQuery?: string;
+}
 
-export function Shop({ onOpenProduct }: ShopProps) {
+export function Shop({ onOpenProduct, searchQuery: externalSearchQuery }: ShopProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
+  const [products, setProducts] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState(externalSearchQuery || '');
+  
+  // Load products from localStorage
+  useEffect(() => {
+    const loadProducts = () => {
+      try {
+        const storedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+        if (storedProducts) {
+          setProducts(JSON.parse(storedProducts));
+        } else {
+          // Fallback to default products if none in localStorage
+          setProducts(defaultProducts);
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        setProducts(defaultProducts);
+      }
+    };
+
+    loadProducts();
+    
+    // Listen for storage changes (when admin adds/updates products)
+    const handleStorageChange = () => {
+      loadProducts();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    // Also listen for custom event from same tab
+    window.addEventListener('products-updated', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('products-updated', handleStorageChange);
+    };
+  }, []);
+  
+  // Update search query when external prop changes
+  useEffect(() => {
+    if (externalSearchQuery !== undefined) {
+      setSearchQuery(externalSearchQuery);
+    }
+  }, [externalSearchQuery]);
   
   // Handle filter events from navigation
   useEffect(() => {
@@ -175,16 +223,32 @@ export function Shop({ onOpenProduct }: ShopProps) {
 
   // Filter products
   const filteredProducts = products.filter(product => {
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        product.name?.toLowerCase().includes(query) ||
+        product.category?.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query) ||
+        product.type?.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+    
+    // Category filter
     if (!selectedCategories.includes('all')) {
       const categoryMatch = selectedCategories.some(cat => {
         if (cat === 'streetwear') return product.category.toLowerCase().includes('graphic') || product.category.toLowerCase().includes('urban');
         if (cat === 'men') return product.gender === 'men' || product.gender === 'unisex';
         if (cat === 'women') return product.gender === 'women' || product.gender === 'unisex';
         if (cat === 'accessories') return product.type === 'accessories';
+        if (cat === 'tshirts') return product.type === 'tshirts';
+        if (cat === 'hoodies') return product.type === 'hoodies';
         return false;
       });
       if (!categoryMatch) return false;
     }
+    
+    // Price filter
     if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
     return true;
   });
@@ -477,11 +541,14 @@ export function Shop({ onOpenProduct }: ShopProps) {
               </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-stretch">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {sortedProducts.map((product) => (
-                <div key={product.id} className="h-full flex">
-                  <ProductCard {...product} id={product.id} onClick={() => onOpenProduct(product)} />
-                </div>
+                <ProductCard 
+                  key={product.id} 
+                  {...product} 
+                  id={product.id} 
+                  onClick={() => onOpenProduct(product)} 
+                />
               ))}
             </div>
 

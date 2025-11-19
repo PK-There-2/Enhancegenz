@@ -157,6 +157,9 @@ export function AdminDashboard() {
       setIsAddingNew(false);
       resetForm();
       showNotification('success', 'Product added successfully!');
+      
+      // Trigger event to notify Shop component
+      window.dispatchEvent(new Event('products-updated'));
     } catch (error: any) {
       showNotification('error', error.message || 'Failed to add product');
     }
@@ -187,6 +190,9 @@ export function AdminDashboard() {
       setEditingProduct(null);
       resetForm();
       showNotification('success', 'Product updated successfully!');
+      
+      // Trigger event to notify Shop component
+      window.dispatchEvent(new Event('products-updated'));
     } catch (error: any) {
       showNotification('error', error.message || 'Failed to update product');
     }
@@ -206,6 +212,9 @@ export function AdminDashboard() {
       localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(updatedProducts));
       setProducts(updatedProducts);
       showNotification('success', 'Product deleted successfully!');
+      
+      // Trigger event to notify Shop component
+      window.dispatchEvent(new Event('products-updated'));
     } catch (error: any) {
       showNotification('error', error.message || 'Failed to delete product');
     }
