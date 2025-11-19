@@ -24,6 +24,8 @@ import { FloatingRewardsButton } from './components/FloatingRewardsButton';
 import { Checkout } from './components/Checkout';
 import { RefundPolicy } from './components/RefundPolicy';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { RefundPolicyFooter } from './components/RefundPolicyFooter';
+import { PrivacyPolicyFooter } from './components/PrivacyPolicyFooter';
 import { ContactPage } from './components/ContactPage';
 
 export default function App() {
@@ -41,7 +43,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
   const [checkoutSource, setCheckoutSource] = useState<'cart' | 'buynow'>('cart');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -52,7 +54,7 @@ function AppContent() {
     const detail = event.detail;
     
     // Handle simple page navigation
-    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'contact-page'].includes(detail)) {
+    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page'].includes(detail)) {
       navigateToPage(detail as any);
       return;
     }
@@ -61,7 +63,7 @@ function AppContent() {
     if (typeof detail === 'object' && detail !== null) {
       const { page, scrollTo, filter } = detail;
       
-      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'contact-page'].includes(page)) {
+      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page'].includes(page)) {
         navigateToPage(page as any);
         
         // Handle scroll to section
@@ -89,7 +91,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page') => {
+  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page') => {
     setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
     // Clear search query when navigating away from shop
@@ -184,17 +186,43 @@ function AppContent() {
     
     // Show refund policy page
     if (currentPage === 'refund-policy') {
-      return <RefundPolicy onBack={() => navigateToPage('home')} />;
+      return <RefundPolicy onBack={() => navigateToPage('checkout')} />;
     }
     
     // Show privacy policy page
     if (currentPage === 'privacy-policy') {
-      return <PrivacyPolicy onBack={() => navigateToPage('home')} />;
+      return <PrivacyPolicy onBack={() => navigateToPage('checkout')} />;
     }
     
     // Show contact page
     if (currentPage === 'contact-page') {
-      return <ContactPage onBack={() => navigateToPage('home')} />;
+      return <ContactPage onBack={() => navigateToPage('checkout')} />;
+    }
+    
+    // Show footer version of refund policy (scrolls to footer when closed)
+    if (currentPage === 'refund-policy-footer') {
+      return <RefundPolicyFooter onBack={() => {
+        navigateToPage('home');
+        setTimeout(() => {
+          const footer = document.querySelector('footer');
+          if (footer) {
+            footer.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }} />;
+    }
+    
+    // Show footer version of privacy policy (scrolls to footer when closed)
+    if (currentPage === 'privacy-policy-footer') {
+      return <PrivacyPolicyFooter onBack={() => {
+        navigateToPage('home');
+        setTimeout(() => {
+          const footer = document.querySelector('footer');
+          if (footer) {
+            footer.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }} />;
     }
 
     // Show product detail if a product is selected
