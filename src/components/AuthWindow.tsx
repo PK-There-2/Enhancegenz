@@ -99,19 +99,19 @@ export default function AuthPage() {
         const user = JSON.parse(userData);
         
         // Send success message to parent window
-        if (window.opener) {
+        if (window.opener && !window.opener.closed) {
           window.opener.postMessage({ 
             type: 'AUTH_SUCCESS', 
             user 
-          }, '*');
+          }, window.location.origin);
           
-          // Close popup after a short delay
+          // Close popup after a short delay to ensure message is received
           setTimeout(() => {
             window.close();
-          }, 500);
+          }, 300);
         } else {
-          // If not in popup, just show success
-          alert("Success! Signed in as " + user.name);
+          // If not in popup, reload to refresh auth state
+          window.location.reload();
         }
       }
     } catch (err: any) {

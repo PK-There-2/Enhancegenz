@@ -50,11 +50,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'AUTH_SUCCESS') {
-        setUser(event.data.user);
-        if (authWindow) {
+        const userData = event.data.user;
+        // Update user state immediately
+        setUser(userData);
+        // Also update localStorage to ensure persistence
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+        
+        // Close the popup window
+        if (authWindow && !authWindow.closed) {
           authWindow.close();
-          setAuthWindow(null);
         }
+        setAuthWindow(null);
       } else if (event.data.type === 'AUTH_CLOSED') {
         setAuthWindow(null);
       }
@@ -144,6 +150,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     root.render(<AuthWindow />);
 
     popup.focus();
+    
+    // Monitor popup close to clean up state
+    const checkClosed = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(checkClosed);
+        setAuthWindow(null);
+        // Refresh user state from localStorage in case it was updated
+        fetchUser();
+      }
+    }, 500);
   };
 
   return (
