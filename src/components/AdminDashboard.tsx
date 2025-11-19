@@ -84,6 +84,7 @@ export function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [activeSection, setActiveSection] = useState<'dashboard' | 'orders' | 'products' | 'customers' | 'marketing' | 'reports' | 'rewards'>('dashboard');
+  const [isAddingReward, setIsAddingReward] = useState(false);
   const { userRewards, openRewardsWindow } = useRewards();
 
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -105,6 +106,14 @@ export function AdminDashboard() {
       { size: 'XL', stock: 0 },
       { size: 'XXL', stock: 0 }
     ]
+  });
+
+  const [rewardFormData, setRewardFormData] = useState({
+    name: '',
+    description: '',
+    points: 0,
+    icon: '🎁',
+    available: true
   });
 
   useEffect(() => {
@@ -246,6 +255,16 @@ export function AdminDashboard() {
         { size: 'XL', stock: 0 },
         { size: 'XXL', stock: 0 }
       ]
+    });
+  };
+
+  const resetRewardForm = () => {
+    setRewardFormData({
+      name: '',
+      description: '',
+      points: 0,
+      icon: '🎁',
+      available: true
     });
   };
 
@@ -613,13 +632,14 @@ export function AdminDashboard() {
   );
 
   const renderRewardsSection = () => {
+    // This would normally come from a database/API
     const rewards = [
       {
         id: '1',
         name: '₹100 off coupon',
         description: 'Use on your next purchase',
         points: 500,
-        redeemed: 45,
+        redeemed: 0,
         available: true,
         icon: '🎫'
       },
@@ -628,7 +648,7 @@ export function AdminDashboard() {
         name: '₹200 off coupon',
         description: 'Use on orders above ₹1000',
         points: 1000,
-        redeemed: 32,
+        redeemed: 0,
         available: true,
         icon: '🎫'
       },
@@ -637,7 +657,7 @@ export function AdminDashboard() {
         name: '₹500 off coupon',
         description: 'Use on orders above ₹2000',
         points: 2500,
-        redeemed: 18,
+        redeemed: 0,
         available: true,
         icon: '🎫'
       },
@@ -646,7 +666,7 @@ export function AdminDashboard() {
         name: 'Free shipping',
         description: 'Free delivery on next order',
         points: 300,
-        redeemed: 67,
+        redeemed: 0,
         available: true,
         icon: '🚚'
       },
@@ -655,7 +675,7 @@ export function AdminDashboard() {
         name: 'Mystery gift',
         description: 'Surprise gift with your order',
         points: 1500,
-        redeemed: 12,
+        redeemed: 0,
         available: true,
         icon: '🎁'
       }
@@ -663,6 +683,20 @@ export function AdminDashboard() {
 
     const totalRedeemed = rewards.reduce((sum, r) => sum + r.redeemed, 0);
     const totalPointsIssued = rewards.reduce((sum, r) => sum + (r.redeemed * r.points), 0);
+
+    const handleAddReward = () => {
+      if (!rewardFormData.name || !rewardFormData.description || rewardFormData.points <= 0) {
+        showNotification('error', 'Please fill in all reward fields');
+        return;
+      }
+      
+      // Here you would save to database/localStorage
+      showNotification('success', `Reward "${rewardFormData.name}" added successfully!`);
+      resetRewardForm();
+      setIsAddingReward(false);
+    };
+
+    const iconOptions = ['🎫', '🎁', '🚚', '⭐', '🏆', '💎', '🎉', '✨', '🔥', '💰'];
 
     return (
       <div className="space-y-6">
@@ -691,49 +725,46 @@ export function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-100 shadow-sm">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Rewards Redeemed</p>
                 <h3 className="text-3xl font-bold text-gray-900 mt-2">{totalRedeemed}</h3>
-                <div className="flex items-center gap-2 text-sm text-pink-600 mt-3">
-                  <TrendingUp className="w-4 h-4" />
-                  <span>Active rewards</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mt-3">
+                  <span>Ready to start</span>
                 </div>
               </div>
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pink-100 text-pink-600">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-600">
                 <Award className="w-6 h-6" />
               </span>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-sm">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Points Issued</p>
                 <h3 className="text-3xl font-bold text-gray-900 mt-2">{totalPointsIssued.toLocaleString()}</h3>
-                <div className="flex items-center gap-2 text-sm text-purple-600 mt-3">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Points distributed</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mt-3">
+                  <span>No points distributed yet</span>
                 </div>
               </div>
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-600">
                 <Sparkles className="w-6 h-6" />
               </span>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-6 border border-rose-100 shadow-sm">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Active Users</p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-2">1,234</h3>
-                <div className="flex items-center gap-2 text-sm text-rose-600 mt-3">
-                  <Users className="w-4 h-4" />
-                  <span>In rewards program</span>
+                <h3 className="text-3xl font-bold text-gray-900 mt-2">0</h3>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mt-3">
+                  <span>Awaiting first users</span>
                 </div>
               </div>
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-600">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-600">
                 <Users className="w-6 h-6" />
               </span>
             </div>
@@ -747,11 +778,115 @@ export function AdminDashboard() {
               <h3 className="text-2xl font-bold text-gray-900">Available Rewards</h3>
               <p className="text-sm text-gray-500 mt-1">Manage rewards that customers can redeem</p>
             </div>
-            <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2">
-              <Gift className="w-4 h-4" />
-              <span>Add Reward</span>
+            <button 
+              onClick={() => setIsAddingReward(!isAddingReward)}
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+            >
+              {isAddingReward ? (
+                <>
+                  <X className="w-4 h-4" />
+                  <span>Cancel</span>
+                </>
+              ) : (
+                <>
+                  <Gift className="w-4 h-4" />
+                  <span>Add Reward</span>
+                </>
+              )}
             </button>
           </div>
+
+          {/* Add Reward Form */}
+          {isAddingReward && (
+            <div className="mb-6 p-6 bg-gray-50 rounded-xl border-2 border-gray-200">
+              <h4 className="text-lg font-bold text-gray-900 mb-4">Create New Reward</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Reward Name *</label>
+                  <input
+                    type="text"
+                    value={rewardFormData.name}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, name: e.target.value })}
+                    placeholder="e.g., ₹100 off coupon"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Points Required *</label>
+                  <input
+                    type="number"
+                    value={rewardFormData.points}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, points: parseInt(e.target.value) || 0 })}
+                    placeholder="500"
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900"
+                  />
+                </div>
+                
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                  <textarea
+                    value={rewardFormData.description}
+                    onChange={(e) => setRewardFormData({ ...rewardFormData, description: e.target.value })}
+                    placeholder="Describe the reward and any conditions..."
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+                  <div className="flex flex-wrap gap-2">
+                    {iconOptions.map((icon) => (
+                      <button
+                        key={icon}
+                        onClick={() => setRewardFormData({ ...rewardFormData, icon })}
+                        className={`text-2xl p-2 rounded-lg border-2 transition-all ${
+                          rewardFormData.icon === icon
+                            ? 'border-black bg-gray-100'
+                            : 'border-gray-200 hover:border-gray-400'
+                        }`}
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={rewardFormData.available}
+                      onChange={(e) => setRewardFormData({ ...rewardFormData, available: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Make reward available immediately</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleAddReward}
+                  className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Create Reward</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAddingReward(false);
+                    resetRewardForm();
+                  }}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rewards.map((reward) => (
@@ -793,32 +928,10 @@ export function AdminDashboard() {
         {/* Rewards Activity */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Recent Redemptions</h3>
-          <div className="space-y-4">
-            {[
-              { user: 'John Doe', reward: '₹100 off coupon', points: 500, date: '2 hours ago' },
-              { user: 'Jane Smith', reward: 'Free shipping', points: 300, date: '5 hours ago' },
-              { user: 'Mike Johnson', reward: '₹200 off coupon', points: 1000, date: '1 day ago' },
-              { user: 'Sarah Williams', reward: 'Mystery gift', points: 1500, date: '2 days ago' },
-            ].map((redemption, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {redemption.user.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{redemption.user}</p>
-                    <p className="text-sm text-gray-600">{redemption.reward}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-pink-600">-{redemption.points} pts</p>
-                  <p className="text-xs text-gray-500">{redemption.date}</p>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-12 text-gray-500">
+            <Gift className="w-16 h-16 mx-auto mb-4 opacity-30" />
+            <p className="text-lg font-medium">No redemptions yet</p>
+            <p className="text-sm mt-2">Redemption activity will appear here once customers start using rewards</p>
           </div>
         </div>
       </div>
