@@ -173,7 +173,7 @@ function AppContent() {
     
     // Show refund policy page
     if (currentPage === 'refund-policy') {
-      return <RefundPolicy onBack={() => window.history.back()} />;
+      return <RefundPolicy onBack={() => navigateToPage('checkout')} />;
     }
 
     // Show product detail if a product is selected
