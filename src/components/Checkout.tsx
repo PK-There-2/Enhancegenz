@@ -645,7 +645,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                   <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'refund-policy' }))} className="text-blue-600 hover:underline">
                     Refund policy
                   </button>
-                  <button onClick={() => setPolicy('privacy')} className="text-blue-600 hover:underline">
+                  <button onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'privacy-policy' }))} className="text-blue-600 hover:underline">
                     Privacy policy
                   </button>
                   <button onClick={() => setPolicy('contact')} className="text-blue-600 hover:underline">

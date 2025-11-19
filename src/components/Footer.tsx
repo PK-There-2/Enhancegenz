@@ -45,11 +45,20 @@ export function Footer() {
             <h4 className="mb-4">Help</h4>
             <ul className="space-y-2 text-sm text-white/60">
               <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: 'refund-policy' });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Refund Policy</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: 'privacy-policy' });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Privacy Policy</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Size Guide</a></li>
               <li><a href="#" onClick={(e) => {
                 e.preventDefault();
-                const event = new CustomEvent('navigate', { detail: 'contact' });
+                const event = new CustomEvent('navigate', { detail: 'contact-page' });
                 window.dispatchEvent(event);
               }} className="hover:text-white transition-colors cursor-pointer">Contact Us</a></li>
             </ul>

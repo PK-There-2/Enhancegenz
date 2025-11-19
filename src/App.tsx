@@ -23,6 +23,8 @@ import { ProductDetail, type ProductDetailData } from './components/ProductDetai
 import { FloatingRewardsButton } from './components/FloatingRewardsButton';
 import { Checkout } from './components/Checkout';
 import { RefundPolicy } from './components/RefundPolicy';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { ContactPage } from './components/ContactPage';
 
 export default function App() {
   return (
@@ -39,7 +41,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
   const [checkoutSource, setCheckoutSource] = useState<'cart' | 'buynow'>('cart');
   const { addToCart, cart, clearCart } = useCart();
@@ -49,7 +51,7 @@ function AppContent() {
     const detail = event.detail;
     
     // Handle simple page navigation
-    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy'].includes(detail)) {
+    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'contact-page'].includes(detail)) {
       navigateToPage(detail as any);
       return;
     }
@@ -58,7 +60,7 @@ function AppContent() {
     if (typeof detail === 'object' && detail !== null) {
       const { page, scrollTo, filter } = detail;
       
-      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy'].includes(page)) {
+      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'contact-page'].includes(page)) {
         navigateToPage(page as any);
         
         // Handle scroll to section
@@ -86,7 +88,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy') => {
+  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'contact-page') => {
     setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -173,7 +175,17 @@ function AppContent() {
     
     // Show refund policy page
     if (currentPage === 'refund-policy') {
-      return <RefundPolicy onBack={() => navigateToPage('checkout')} />;
+      return <RefundPolicy onBack={() => navigateToPage('home')} />;
+    }
+    
+    // Show privacy policy page
+    if (currentPage === 'privacy-policy') {
+      return <PrivacyPolicy onBack={() => navigateToPage('home')} />;
+    }
+    
+    // Show contact page
+    if (currentPage === 'contact-page') {
+      return <ContactPage onBack={() => navigateToPage('home')} />;
     }
 
     // Show product detail if a product is selected
