@@ -129,22 +129,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ✅ Popup Logic (React inside popup)
   const openAuthWindow = () => {
     // On mobile (or when popup blocked) show in-app modal instead
-    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+
+    // Always use modal for mobile devices to prevent blank pages
+    if (isMobile) {
+      setIsAuthModalOpen(true);
+      return;
+    }
 
     const width = 500;
     const height = 700;
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
 
-    // Try to open popup first for desktop
+    // Try to open popup for desktop
     const popup = window.open(
       "",
       "Thread Trends Login",
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
 
-    // If mobile or popup couldn't be created, open in-app modal
-    if (isMobile || !popup) {
+    // If popup couldn't be created, open in-app modal
+    if (!popup) {
       setIsAuthModalOpen(true);
       return;
     }

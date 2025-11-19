@@ -225,6 +225,29 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          div[style*="minHeight: \"100vh\""] {
+            padding: 10px;
+          }
+          div[style*="maxWidth: \"480px\""] {
+            margin: 10px;
+            maxWidth: none;
+          }
+          div[style*="padding: \"48px 40px 36px\""] {
+            padding: 30px 20px 25px;
+          }
+          div[style*="padding: \"40px\""] {
+            padding: 25px 20px;
+          }
+          h1 {
+            font-size: 24px !important;
+          }
+          p {
+            font-size: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -237,7 +260,9 @@ const styles: any = {
     display: "flex", 
     justifyContent: "center", 
     alignItems: "center",
-    padding: "20px"
+    padding: "20px",
+    margin: 0,
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
   },
   container: { 
     background: "#fff", 
@@ -245,16 +270,19 @@ const styles: any = {
     maxWidth: "480px", 
     borderRadius: "16px", 
     overflow: "hidden",
-    boxShadow: "0 30px 60px rgba(102, 126, 234, 0.25)"
+    boxShadow: "0 30px 60px rgba(102, 126, 234, 0.25)",
+    margin: "20px"
   },
   header: { 
     textAlign: "center" as const, 
     padding: "48px 40px 36px", 
     color: "#fff", 
-    background: "linear-gradient(135deg,#764ba2,#667eea)"
+    background: "linear-gradient(135deg,#764ba2,#667eea)",
+    boxSizing: "border-box"
   },
   content: { 
-    padding: "40px" 
+    padding: "40px",
+    boxSizing: "border-box"
   },
   tabs: { 
     display: "flex", 
