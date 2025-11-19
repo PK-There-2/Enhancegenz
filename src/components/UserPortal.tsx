@@ -60,7 +60,7 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-100 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
@@ -240,13 +240,13 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-6 mb-6">
+                    <div className="space-y-6 mb-8" >
                       {cart.map((item) => (
                         <div key={`${item.productId}-${item.size}`} className="flex gap-4 pb-6 border-b border-gray-200 last:border-0">
                           <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                           </div>
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 flex flex-col justify-between min-w-0">
                             <div className="flex justify-between items-start mb-2">
                               <div className="flex-1 pr-4">
                                 <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{item.name}</h3>
@@ -260,20 +260,20 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
                                 <Trash2 className="w-5 h-5" />
                               </button>
                             </div>
-                            <div className="flex items-center justify-between mt-3">
+                            <div className="flex items-center justify-between gap-4 flex-wrap">
                               <p className="text-lg font-bold text-gray-900">₹{item.price.toLocaleString()}</p>
                               <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                                 <button
                                   onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
-                                  className="px-4 py-2 hover:bg-gray-50 transition-colors text-gray-600"
+                                  className="px-3 py-2 hover:bg-gray-50 transition-colors text-gray-600 text-sm"
                                   disabled={item.quantity <= 1}
                                 >
                                   −
                                 </button>
-                                <span className="px-4 py-2 min-w-[50px] text-center font-medium border-x border-gray-300">{item.quantity}</span>
+                                <span className="px-3 py-2 min-w-[40px] text-center font-medium border-x border-gray-300 text-sm">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
-                                  className="px-4 py-2 hover:bg-gray-50 transition-colors text-gray-600"
+                                  className="px-3 py-2 hover:bg-gray-50 transition-colors text-gray-600 text-sm"
                                 >
                                   +
                                 </button>
