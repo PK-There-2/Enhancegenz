@@ -254,13 +254,61 @@ export function AdminDashboard() {
     p.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Calculate real-time analytics
+  const calculateAnalytics = () => {
+    const totalProducts = products.length;
+    const totalStock = products.reduce((sum, p) => {
+      const productStock = p.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+      return sum + productStock;
+    }, 0);
+    
+    // Calculate total potential revenue (price × stock for all products)
+    const totalRevenue = products.reduce((sum, p) => {
+      const productStock = p.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+      return sum + (p.price * productStock);
+    }, 0);
+    
+    // Calculate products on sale
+    const productsOnSale = products.filter(p => p.isSale).length;
+    
+    // Calculate average discount percentage
+    const avgDiscount = products.filter(p => p.isSale && p.originalPrice).length > 0
+      ? products
+          .filter(p => p.isSale && p.originalPrice)
+          .reduce((sum, p) => {
+            const discount = ((p.originalPrice! - p.price) / p.originalPrice!) * 100;
+            return sum + discount;
+          }, 0) / products.filter(p => p.isSale && p.originalPrice).length
+      : 0;
+
+    // Get category breakdown
+    const categoryBreakdown = products.reduce((acc, p) => {
+      acc[p.category] = (acc[p.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topCategories = Object.entries(categoryBreakdown)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([label, count]) => ({
+        label,
+        value: totalProducts > 0 ? Math.round((count / totalProducts) * 100) : 0
+      }));
+
+    return {
+      totalProducts,
+      totalStock,
+      totalRevenue,
+      productsOnSale,
+      avgDiscount: Math.round(avgDiscount),
+      topCategories
+    };
+  };
+
+  const analytics = calculateAnalytics();
+
   // Render Dashboard Section
   const renderDashboard = () => {
-    const totalRevenue = products.reduce((sum, p) => sum + (p.price * 10), 0);
-    const totalProducts = products.length;
-    const totalOrders = 156;
-    const netMargin = 15;
-
     return (
       <div className="space-y-6">
         {/* Stats Cards */}
@@ -268,11 +316,10 @@ export function AdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Revenue</p>
-                <h3 className="text-3xl font-semibold text-gray-900 mt-2">₹{totalRevenue.toLocaleString()}</h3>
-                <div className="flex items-center gap-2 text-sm text-emerald-600 mt-3">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span>+12% from last month</span>
+                <p className="text-sm font-medium text-gray-500">Total Revenue Potential</p>
+                <h3 className="text-3xl font-semibold text-gray-900 mt-2">₹{analytics.totalRevenue.toLocaleString()}</h3>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
+                  <span>Based on current stock</span>
                 </div>
               </div>
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-600">
@@ -284,11 +331,10 @@ export function AdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Net Margin</p>
-                <h3 className="text-3xl font-semibold text-gray-900 mt-2">{netMargin}%</h3>
-                <div className="flex items-center gap-2 text-sm text-blue-600 mt-3">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span>+2% from last month</span>
+                <p className="text-sm font-medium text-gray-500">Average Discount</p>
+                <h3 className="text-3xl font-semibold text-gray-900 mt-2">{analytics.avgDiscount}%</h3>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
+                  <span>{analytics.productsOnSale} products on sale</span>
                 </div>
               </div>
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600">
@@ -300,61 +346,55 @@ export function AdminDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Orders Uplift</p>
-                <h3 className="text-3xl font-semibold text-gray-900 mt-2">{totalOrders}</h3>
-                <div className="flex items-center gap-2 text-sm text-rose-600 mt-3">
-                  <ArrowDownRight className="w-4 h-4" />
-                  <span>-5% from last month</span>
+                <p className="text-sm font-medium text-gray-500">Total Stock</p>
+                <h3 className="text-3xl font-semibold text-gray-900 mt-2">{analytics.totalStock}</h3>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
+                  <span>{analytics.totalProducts} products available</span>
                 </div>
               </div>
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-600">
-                <ShoppingCart className="w-6 h-6" />
+                <Package className="w-6 h-6" />
               </span>
             </div>
           </div>
         </div>
 
-        {/* Revenue Overview & Sortable Data */}
+        {/* Business Growth Tracker */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue Chart */}
+          {/* Growth Milestones */}
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h3 className="text-2xl font-semibold text-gray-900">Revenue Overview</h3>
-                <p className="text-sm text-gray-500 mt-1">Quarterly revenue split with YoY trend</p>
+                <h3 className="text-2xl font-semibold text-gray-900">Growth Milestones</h3>
+                <p className="text-sm text-gray-500 mt-1">Track your business progress</p>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full">
-                <ArrowUpRight className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-semibold text-emerald-600">+18% YoY</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
+                <span className="text-sm font-semibold text-gray-600">Starting Fresh</span>
               </div>
             </div>
 
              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {[{
                 title: 'Q1',
-                amount: '₹1.2M',
-                change: '+12%',
-                description: 'New year sale impact',
-                color: 'from-blue-500 to-blue-600'
+                amount: '₹0',
+                description: 'Ready to launch',
+                color: 'from-gray-400 to-gray-500'
               }, {
                 title: 'Q2',
-                amount: '₹1.8M',
-                change: '+9%',
-                description: 'Summer collection launch',
-                color: 'from-purple-500 to-purple-600'
+                amount: '₹0',
+                description: 'Building momentum',
+                color: 'from-gray-400 to-gray-500'
               }, {
                 title: 'Q3',
-                amount: '₹2.4M',
-                change: '+14%',
-                description: 'Festive season build-up',
-                color: 'from-orange-500 to-orange-600'
+                amount: '₹0',
+                description: 'Growing strong',
+                color: 'from-gray-400 to-gray-500'
               }, {
                 title: 'Q4',
-                amount: '₹3.1M',
-                change: '+22%',
-                description: 'Holiday campaign peak',
-                color: 'from-emerald-500 to-emerald-600'
-              }].map(({ title, amount, change, description, color }) => (
+                amount: '₹0',
+                description: 'Reaching goals',
+                color: 'from-gray-400 to-gray-500'
+              }].map(({ title, amount, description, color }) => (
                 <div
                   key={title}
                    className="group relative overflow-hidden rounded-xl border border-gray-200 p-5 bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
@@ -363,9 +403,6 @@ export function AdminDashboard() {
                      <span className="inline-flex items-center px-3 py-1 rounded-full border border-gray-300 bg-gray-50 text-xs font-semibold text-gray-900 tracking-wide">
                        {title}
                      </span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                      {change}
-                    </span>
                   </div>
                   <p className="text-2xl font-bold text-gray-900 mb-2">{amount}</p>
                   <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
@@ -383,101 +420,109 @@ export function AdminDashboard() {
                   </div>
                   <p className="text-base font-semibold text-gray-900">Top Performing Categories</p>
                 </div>
-                <div className="space-y-5">
-                  {[{
-                    label: 'Graphic Tees',
-                    value: 38,
-                    color: 'from-black to-gray-800'
-                  }, {
-                    label: 'Hoodies',
-                    value: 26,
-                    color: 'from-gray-700 to-gray-900'
-                  }, {
-                    label: 'Accessories',
-                    value: 18,
-                    color: 'from-gray-500 to-gray-700'
-                  }].map(({ label, value, color }) => (
-                    <div key={label}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">{label}</span>
-                        <span className="text-sm font-bold text-gray-900">{value}%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${color} transition-all duration-500`}
-                          style={{ width: `${value}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {analytics.topCategories.length > 0 ? (
+                  <div className="space-y-5">
+                    {analytics.topCategories.map(({ label, value }, idx) => {
+                      const colors = [
+                        'from-black to-gray-800',
+                        'from-gray-700 to-gray-900',
+                        'from-gray-500 to-gray-700'
+                      ];
+                      return (
+                        <div key={label}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">{label}</span>
+                            <span className="text-sm font-bold text-gray-900">{value}%</span>
+                          </div>
+                          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full bg-gradient-to-r ${colors[idx]} transition-all duration-500`}
+                              style={{ width: `${value}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No categories yet</p>
+                    <p className="text-sm">Add products to see category breakdown</p>
+                  </div>
+                )}
               </div>
 
-              {/* Monthly Snapshot */}
+              {/* Product Overview */}
               <div className="rounded-xl border border-gray-200 p-6 bg-gradient-to-br from-gray-50 to-white">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4" />
+                    <Package className="w-4 h-4" />
                   </div>
-                  <p className="text-base font-semibold text-gray-900">Monthly Snapshot</p>
+                  <p className="text-base font-semibold text-gray-900">Product Overview</p>
                 </div>
                 <div className="space-y-4">
-                  {[{
-                    month: 'January',
-                    revenue: '₹320K',
-                    orders: 450,
-                    growth: '+8%'
-                  }, {
-                    month: 'February',
-                    revenue: '₹380K',
-                    orders: 490,
-                    growth: '+12%'
-                  }, {
-                    month: 'March',
-                    revenue: '₹410K',
-                    orders: 530,
-                    growth: '+15%'
-                  }].map(({ month, revenue, orders, growth }) => (
-                    <div key={month} className="flex items-center justify-between p-3 rounded-lg hover:bg-white transition-colors">
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-900">{month}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <p className="text-xs text-gray-500">{orders} orders</p>
-                          <span className="w-1 h-1 rounded-full bg-gray-300" />
-                          <p className="text-xs font-medium text-emerald-600">{growth}</p>
-                        </div>
-                      </div>
-                      <p className="text-base font-bold text-gray-900">{revenue}</p>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-white hover:shadow-sm transition-all">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-900">Total Products</p>
+                      <p className="text-xs text-gray-500 mt-1">Active inventory</p>
                     </div>
-                  ))}
+                    <p className="text-2xl font-bold text-gray-900">{analytics.totalProducts}</p>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-white hover:shadow-sm transition-all">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-900">Total Stock</p>
+                      <p className="text-xs text-gray-500 mt-1">All units combined</p>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.totalStock}</p>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-white hover:shadow-sm transition-all">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-900">On Sale</p>
+                      <p className="text-xs text-gray-500 mt-1">Discounted items</p>
+                    </div>
+                    <p className="text-2xl font-bold text-emerald-600">{analytics.productsOnSale}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Sortable Revenue Data */}
+          {/* Product Revenue Breakdown */}
           <div className="bg-white rounded-xl p-6 shadow-md">
-            <h3 className="text-xl font-semibold mb-6 text-gray-900">Sortable Revenue Data</h3>
-            <div className="space-y-3">
-              {[
-                { name: 'Dress', order: 'Order ID', amount: '₹12,500' },
-                { name: 'Denim', order: 'Product', amount: '₹8,900' },
-                { name: 'Hoodies', order: 'Product', amount: '₹15,600' },
-                { name: 'Jackets', order: 'Product', amount: '₹22,300' },
-                { name: 'Shirts', order: 'Product', amount: '₹9,400' }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div>
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.order}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gray-900">{item.amount}</p>
-                    <button className="text-xs text-blue-600 hover:text-blue-800">↑</button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h3 className="text-xl font-semibold mb-6 text-gray-900">Product Value Breakdown</h3>
+            {products.length > 0 ? (
+              <div className="space-y-3">
+                {products
+                  .sort((a, b) => {
+                    const aStock = a.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+                    const bStock = b.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+                    return (b.price * bStock) - (a.price * aStock);
+                  })
+                  .slice(0, 5)
+                  .map((product) => {
+                    const stock = product.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+                    const value = product.price * stock;
+                    return (
+                      <div key={product.id} className="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div>
+                          <p className="font-medium text-gray-900">{product.name}</p>
+                          <p className="text-xs text-gray-500">{stock} units in stock</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900">₹{value.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500">₹{product.price} each</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No products yet</p>
+                <p className="text-sm">Add products to see value breakdown</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -485,24 +530,24 @@ export function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[{
             label: 'Total Products',
-            value: totalProducts,
+            value: analytics.totalProducts,
             subtext: 'Currently active SKUs',
             Icon: Package
           }, {
-            label: 'Total Orders',
-            value: totalOrders,
-            subtext: 'Processed in the last 30 days',
+            label: 'Total Stock Units',
+            value: analytics.totalStock,
+            subtext: 'Items in inventory',
             Icon: ShoppingBag
           }, {
-            label: 'Total Customers',
-            value: '1,234',
-            subtext: 'Registered shoppers',
-            Icon: Users
-          }, {
-            label: 'Conversion Rate',
-            value: '3.2%',
-            subtext: 'Storewide over the last week',
+            label: 'Products on Sale',
+            value: analytics.productsOnSale,
+            subtext: 'Active discounts',
             Icon: TrendingUp
+          }, {
+            label: 'Categories',
+            value: Object.keys(products.reduce((acc, p) => ({ ...acc, [p.category]: 1 }), {})).length,
+            subtext: 'Unique product categories',
+            Icon: LayoutDashboard
           }].map(({ label, value, subtext, Icon }) => (
             <div
               key={label}
