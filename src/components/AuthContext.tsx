@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createRoot } from "react-dom/client";
 import AuthWindow from './AuthWindow';
+import AuthModal from './AuthModal';
 
 interface User {
   id: string;
@@ -42,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authWindow, setAuthWindow] = useState<Window | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     initializeDemoData();
@@ -121,18 +123,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ✅ Popup Logic (React inside popup)
   const openAuthWindow = () => {
+    // On mobile (or when popup blocked) show in-app modal instead
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+
     const width = 500;
     const height = 700;
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
 
+    // Try to open popup first for desktop
     const popup = window.open(
       "",
       "Thread Trends Login",
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
 
-    if (!popup) return;
+    // If mobile or popup couldn't be created, open in-app modal
+    if (isMobile || !popup) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     setAuthWindow(popup);
 
     popup.document.title = "Thread Trends Login";
@@ -162,9 +173,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 500);
   };
 
+  // Callback for modal success
+  const handleModalSuccess = async () => {
+    setIsAuthModalOpen(false);
+    await fetchUser();
+  };
+
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, getAccessToken, openAuthWindow }}>
       {children}
+      {/* Render AuthModal for mobile / fallback flows */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={handleModalSuccess} />
     </AuthContext.Provider>
   );
 }
