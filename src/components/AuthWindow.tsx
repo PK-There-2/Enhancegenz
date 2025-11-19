@@ -251,7 +251,7 @@ const styles: any = {
     textAlign: "center" as const, 
     padding: "48px 40px 36px", 
     color: "#fff", 
-    background: "linear-gradient(135deg,#667eea,#764ba2)"
+    background: "linear-gradient(135deg,#764ba2,#667eea)"
   },
   content: { 
     padding: "40px" 
