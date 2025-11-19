@@ -61,22 +61,22 @@ export function AuthModal({ isOpen, onClose, onSuccess, defaultMode = 'signin' }
   };
 
   return createPortal(
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 md:p-6">
-      <div className="bg-white w-full max-w-md shadow-2xl relative rounded-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-0 sm:p-4 md:p-6">
+      <div className="bg-white w-full h-full sm:h-auto sm:w-full sm:max-w-md shadow-2xl relative rounded-none sm:rounded-2xl overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
         >
           <X className="w-6 h-6" />
         </button>
 
         {/* Header */}
-        <div className="p-6 md:p-8 pb-6">
-          <h2 className="text-2xl md:text-3xl mb-2">
+        <div className="p-6 sm:p-8 pb-6 pt-16 sm:pt-8">
+          <h2 className="text-2xl sm:text-3xl mb-2">
             {mode === 'signin' ? 'Welcome Back' : 'Join Thread Trends'}
           </h2>
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-gray-600 text-sm sm:text-base">
             {mode === 'signin' 
               ? 'Sign in to access your account' 
               : 'Create an account to start shopping'}
@@ -84,7 +84,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, defaultMode = 'signin' }
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 md:px-8 pb-8 space-y-4">
+        <form onSubmit={handleSubmit} className="px-6 sm:px-8 pb-8 space-y-4">
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 flex items-center gap-2">
@@ -205,7 +205,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, defaultMode = 'signin' }
         </form>
 
         {/* Demo Info */}
-        <div className="px-6 md:px-8 pb-8">
+        <div className="px-6 sm:px-8 pb-8">
           <div className="bg-blue-50 border border-blue-200 p-4">
             <p className="text-xs text-blue-800">
               <strong>Local Storage Mode (No Database):</strong>

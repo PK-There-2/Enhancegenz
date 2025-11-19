@@ -128,15 +128,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ✅ Popup Logic (React inside popup)
   const openAuthWindow = () => {
-    // On mobile (or when popup blocked) show in-app modal instead
-    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+    // More robust mobile detection
+    const isMobile = (() => {
+      if (typeof navigator === 'undefined') return false;
+      
+      // Check for mobile devices
+      const mobileRegex = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|webOS|iPhone|Android/i;
+      
+      // Also check screen size as a fallback
+      const isSmallScreen = typeof window !== 'undefined' && window.innerWidth <= 768;
+      
+      // Check for touch capability
+      const hasTouch = typeof window !== 'undefined' && 'ontouchstart' in window;
+      
+      return mobileRegex.test(navigator.userAgent) || (isSmallScreen && hasTouch);
+    })();
 
-    // Always use modal for mobile devices to prevent blank pages
+    // Always use modal for mobile devices or small screens to prevent blank pages
     if (isMobile) {
       setIsAuthModalOpen(true);
       return;
     }
 
+    // For desktop, try to open popup
     const width = 500;
     const height = 700;
     const left = window.innerWidth / 2 - width / 2;
@@ -172,12 +186,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     root.render(<AuthWindow />);
 
     popup.focus();
-    // If rendering into the popup fails (some mobile browsers limit scripting into new tabs),
-    // detect that and fallback to the in-app modal shortly after.
+    
+    // Fallback to modal if popup fails
     setTimeout(() => {
       try {
         // If popup closed already, nothing to do
-        if (popup.closed) return;
+        if (popup.closed) {
+          setIsAuthModalOpen(true);
+          return;
+        }
+        
         const bodyHtml = popup.document.body && popup.document.body.innerHTML;
         if (!bodyHtml || bodyHtml.trim().length < 30) {
           // Close the problematic popup and open the modal

@@ -228,23 +228,34 @@ export default function AuthPage() {
       <style>{`
         @media (max-width: 600px) {
           div[style*="minHeight: \"100vh\""] {
-            padding: 10px;
+            padding: 0;
           }
           div[style*="maxWidth: \"480px\""] {
-            margin: 10px;
+            margin: 0;
             maxWidth: none;
+            borderRadius: 0;
           }
           div[style*="padding: \"48px 40px 36px\""] {
-            padding: 30px 20px 25px;
+            padding: 30px 20px;
           }
           div[style*="padding: \"40px\""] {
-            padding: 25px 20px;
+            padding: 30px 20px;
           }
           h1 {
             font-size: 24px !important;
           }
           p {
             font-size: 16px !important;
+          }
+        }
+        
+        /* Ensure full height on mobile */
+        @media (max-width: 768px) {
+          div[style*="minHeight: \"100vh\""] {
+            minHeight: 100vh;
+          }
+          div[style*="maxWidth: \"480px\""] {
+            minHeight: 100vh;
           }
         }
       `}</style>
@@ -260,7 +271,7 @@ const styles: any = {
     display: "flex", 
     justifyContent: "center", 
     alignItems: "center",
-    padding: "20px",
+    padding: "0",
     margin: 0,
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
   },
@@ -268,20 +279,21 @@ const styles: any = {
     background: "#fff", 
     width: "100%",
     maxWidth: "480px", 
-    borderRadius: "16px", 
+    borderRadius: "0",
     overflow: "hidden",
-    boxShadow: "0 30px 60px rgba(102, 126, 234, 0.25)",
-    margin: "20px"
+    boxShadow: "none",
+    margin: "0",
+    minHeight: "100vh"
   },
   header: { 
     textAlign: "center" as const, 
-    padding: "48px 40px 36px", 
+    padding: "30px 20px",
     color: "#fff", 
     background: "linear-gradient(135deg,#764ba2,#667eea)",
     boxSizing: "border-box"
   },
   content: { 
-    padding: "40px",
+    padding: "30px 20px",
     boxSizing: "border-box"
   },
   tabs: { 
