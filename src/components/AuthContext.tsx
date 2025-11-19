@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createRoot } from "react-dom/client";
 import AuthWindow from './AuthWindow';
-import AuthModal from './AuthModal';
+import { AuthModal } from './AuthModal';
 
 interface User {
   id: string;
@@ -64,6 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setAuthWindow(null);
       } else if (event.data.type === 'AUTH_CLOSED') {
+        setAuthWindow(null);
+      } else if (event.data && event.data.type === 'REQUEST_CLOSE') {
+        if (authWindow && !authWindow.closed) {
+          try { authWindow.close(); } catch (e) {}
+        }
         setAuthWindow(null);
       }
     };
@@ -161,6 +166,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     root.render(<AuthWindow />);
 
     popup.focus();
+    // If rendering into the popup fails (some mobile browsers limit scripting into new tabs),
+    // detect that and fallback to the in-app modal shortly after.
+    setTimeout(() => {
+      try {
+        // If popup closed already, nothing to do
+        if (popup.closed) return;
+        const bodyHtml = popup.document.body && popup.document.body.innerHTML;
+        if (!bodyHtml || bodyHtml.trim().length < 30) {
+          // Close the problematic popup and open the modal
+          try { popup.close(); } catch (e) {}
+          setIsAuthModalOpen(true);
+        }
+      } catch (e) {
+        // Access to popup DOM might be restricted; fallback to modal
+        try { popup.close(); } catch (e2) {}
+        setIsAuthModalOpen(true);
+      }
+    }, 400);
     
     // Monitor popup close to clean up state
     const checkClosed = setInterval(() => {
