@@ -120,7 +120,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Search Dropdown */}
               {showSearch && (
-                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 z-50" style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-6rem' }}>
+                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 z-50" style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-7rem' , width: "21rem" }}>
                   <h3 className="text-xl mb-4 text-gray-900">Search Products</h3>
                   <form onSubmit={handleSearch}>
                     <div className="flex gap-2">
@@ -129,14 +129,13 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for products..."
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900"
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-gray-900" style ={{width : '12rem'}}
                         autoFocus
                       />
                       <button
                         type="submit"
-                        className="px-6 py-3 bg-white text-black border-2 border-black rounded-lg hover:bg-black hover:text-white transition-colors font-medium"
-                      >
-                        Search
+                        className="px-4 py-3 bg-white text-black border-2 border-black rounded-lg hover:bg-black hover:text-white transition-colors font-medium" style ={{width : '5rem'}}
+                      >Search
                       </button>
                     </div>
                   </form>
@@ -209,7 +208,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Account Menu Dropdown */}
               {showAccountMenu && (
-                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn"style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-2rem' }}>
+                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn"style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-3.5rem' }}>
                   {user ? (
                     <>
                       <div className="mb-4 pb-4 border-b border-gray-200">
