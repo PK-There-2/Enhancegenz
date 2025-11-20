@@ -174,6 +174,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                             <p className="text-xs text-gray-500">{item.category}</p>
                             <p className="text-sm font-bold mt-1">₹{item.price.toLocaleString()}</p>
                           </div>
+                          
                           <button 
                             onClick={() => removeFromWishlist(item.productId)}
                             className="text-red-500 hover:text-red-700 text-xs"
