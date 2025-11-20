@@ -433,7 +433,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                         By signing up via text, you agree to receive recurring automated marketing messages,
                         including cart reminders, at the phone number provided. Consent is not a condition of purchase.
                         Reply STOP to unsubscribe. Reply HELP for help. Message frequency varies. Msg &amp; data rates
-                        may apply. View our{' '}
+                        may apply. View our{'privacy-policy'}
                         <a href="#" className="text-blue-600 hover:underline">
                           Privacy policy
                         </a>{' '}
