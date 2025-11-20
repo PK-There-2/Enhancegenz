@@ -134,6 +134,9 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
     orders.push(order);
     localStorage.setItem('thread_trends_orders', JSON.stringify(orders));
 
+    // Dispatch event to update orders in UserPortal
+    window.dispatchEvent(new CustomEvent('orders-updated'));
+
     // Award points
     earnPoints('Place an order', 200, `Order #${newOrderNumber} - ₹${orderData.total.toLocaleString()}`);
 

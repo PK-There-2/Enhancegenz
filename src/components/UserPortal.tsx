@@ -9,15 +9,46 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
   const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
   const { wishlist, removeFromWishlist } = useWishlist();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'cart'>('profile');
+  const [orders, setOrders] = useState<any[]>([]);
 
-  // Listen for navigate-to-cart event from header
+  // Load orders from localStorage
+  useEffect(() => {
+    const loadOrders = () => {
+      if (user) {
+        const allOrders = JSON.parse(localStorage.getItem('thread_trends_orders') || '[]');
+        // Filter orders by user email
+        const userOrders = allOrders.filter((order: any) => order.customer.email === user.email);
+        setOrders(userOrders);
+      }
+    };
+    
+    loadOrders();
+    
+    // Listen for order updates
+    const handleOrderUpdate = () => {
+      loadOrders();
+    };
+    
+    window.addEventListener('orders-updated', handleOrderUpdate);
+    return () => window.removeEventListener('orders-updated', handleOrderUpdate);
+  }, [user]);
+
+  // Listen for navigate-to-cart and navigate-to-orders events from header
   useEffect(() => {
     const handleNavigateToCart = () => {
       setActiveTab('cart');
     };
     
+    const handleNavigateToOrders = () => {
+      setActiveTab('orders');
+    };
+    
     window.addEventListener('navigate-to-cart', handleNavigateToCart);
-    return () => window.removeEventListener('navigate-to-cart', handleNavigateToCart);
+    window.addEventListener('navigate-to-orders', handleNavigateToOrders);
+    return () => {
+      window.removeEventListener('navigate-to-cart', handleNavigateToCart);
+      window.removeEventListener('navigate-to-orders', handleNavigateToOrders);
+    };
   }, []);
 
   if (!user) {
@@ -176,16 +207,56 @@ export function UserPortal({ onNavigate }: { onNavigate: (page: string) => void 
             {activeTab === 'orders' && (
               <div className="bg-white shadow-sm p-6 rounded-lg">
                 <h2 className="text-2xl mb-6">My Orders</h2>
-                <div className="text-center py-12">
-                  <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No orders yet</p>
-                  <button
-                    onClick={() => onNavigate('shop')}
-                    className="px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
-                  >
-                    Start Shopping
-                  </button>
-                </div>
+                {orders.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">No orders yet</p>
+                    <button
+                      onClick={() => onNavigate('shop')}
+                      className="px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
+                    >
+                      Start Shopping
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {orders.map((order, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="font-semibold text-lg">Order #{order.orderNumber}</h3>
+                            <p className="text-sm text-gray-600">{new Date(order.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          </div>
+                          <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">Confirmed</span>
+                        </div>
+                        
+                        <div className="space-y-3 mb-4">
+                          {order.items.map((item: any, itemIndex: number) => (
+                            <div key={itemIndex} className="flex gap-4">
+                              <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                              <div className="flex-1">
+                                <h4 className="font-medium">{item.name}</h4>
+                                <p className="text-sm text-gray-600">Size: {item.size} | Qty: {item.quantity}</p>
+                                <p className="text-sm font-semibold">₹{item.price.toLocaleString()}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="border-t pt-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Total</span>
+                            <span className="text-xl font-bold">₹{order.total.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm text-gray-600 mt-2">
+                            <span>Payment Method</span>
+                            <span>{order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI Payment'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
