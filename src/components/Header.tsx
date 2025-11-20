@@ -338,7 +338,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
               className="md:hidden hover:opacity-60 transition-opacity p-1"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? <X className="w-5 h-5"style={{ marginTop: '-4px' }} /> : <Menu className="w-6 h-6 "style={{ marginTop: '-5px' }} />}
             </button>
           </div>
         </div>
