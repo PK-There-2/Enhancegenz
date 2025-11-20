@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Gift, Award, TrendingUp, Users, ChevronRight, ChevronLeft, Copy, Check, Sparkles, CheckCircle } from 'lucide-react';
+import { X, Gift, Award, TrendingUp, Users, ChevronRight, ChevronLeft, Copy, Check, Sparkles, CheckCircle, Home, ArrowLeft } from 'lucide-react';
 import { useRewards } from './RewardsContext';
 import { useAuth } from './AuthContext';
 
@@ -51,36 +51,40 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
     }
   };
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Platinum': return 'from-purple-400 to-purple-600';
-      case 'Gold': return 'from-yellow-400 to-yellow-600';
-      case 'Silver': return 'from-gray-300 to-gray-500';
-      default: return 'from-orange-400 to-orange-600';
+  const getTierColors = (tier: string) => {
+    const tierLower = tier.toLowerCase();
+    if (tierLower === 'gold') {
+      return { bg: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600', text: 'text-white', icon: 'text-white' };
+    } else if (tierLower === 'silver') {
+      return { bg: 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500', text: 'text-gray-900', icon: 'text-gray-900' };
+    } else { // bronze
+      return { bg: 'bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600', text: 'text-white', icon: 'text-white' };
     }
   };
+
+  const tierColors = getTierColors(userRewards?.tier || 'Bronze');
 
   const renderHome = () => (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center pb-4 border-b border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome to
-        </h2>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Thread Trends Loyalty Program
+      <div className="text-center pb-8 border-b-2 border-gray-300 mb-8" style={{ marginTop: '-40px' }}>
+        <h1 className="text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
+          Welcome to Thread Trends
         </h1>
+        <h2 className="text-3xl font-bold text-gray-800">
+          Loyalty Program
+        </h2>
       </div>
 
       {/* Points Display */}
-      <div className="relative bg-gradient-to-br from-pink-500 via-purple-500 to-pink-500 rounded-3xl p-8 text-center shadow-xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-600/20 to-purple-600/20"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+      <div className="relative bg-black rounded-2xl p-8 text-center shadow-2xl overflow-hidden border-2 border-gray-700">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-600/20 via-transparent to-transparent"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-gray-700/30 to-transparent rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-gray-700/30 to-transparent rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
         
         <div className="relative z-10">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <Award className="w-6 h-6 text-white/90" />
+            <Award className="w-7 h-7 text-white" />
             <span className="text-sm font-semibold text-white/90 uppercase tracking-wide">Your Balance</span>
           </div>
           <div className="text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
@@ -90,8 +94,8 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           
           {/* Tier Badge */}
           <div className="mt-6">
-            <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm ${getTierColor(userRewards?.tier || 'Bronze')} text-white font-bold text-sm shadow-lg`}>
-              <TrendingUp className="w-4 h-4" />
+            <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${tierColors.bg} ${tierColors.text} font-bold text-sm shadow-xl border-2 border-white hover:shadow-2xl hover:scale-105 transition-all`}>
+              <TrendingUp className={`w-5 h-5 ${tierColors.icon}`} />
               {userRewards?.tier || 'Bronze'} Member
             </div>
           </div>
@@ -99,10 +103,10 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
       </div>
 
       {/* Become a Member CTA */}
-      <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-pink-200/50 shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-white" />
+      <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 border-2 border-gray-200 shadow-md hover:shadow-xl transition-all">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md p-2.5 border-2 border-gray-200">
+            <Sparkles className="w-7 h-7 text-black" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -120,86 +124,101 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
       </div>
 
       {/* Points Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Points</h3>
+      <div className="mt-8">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md p-2">
+            <Award className="w-6 h-6 text-black" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900">Points</h3>
         </div>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-6 leading-relaxed text-base">
           Earn more Points for different actions, and turn those Points into awesome rewards!
         </p>
 
         {/* Ways to earn */}
         <button
           onClick={() => setCurrentView('earn')}
-          className="w-full flex items-center justify-between p-5 bg-white rounded-xl border-2 border-gray-200 hover:border-pink-400 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 transition-all mb-3 shadow-sm hover:shadow-md group"
+          className="w-full flex items-center justify-between p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-black hover:shadow-2xl transition-all mb-4 shadow-md group hover:scale-[1.02]"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-              <Gift className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md p-3">
+              <Gift className="w-8 h-8 text-black" />
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-900 block">Ways to earn</span>
-              <span className="text-xs text-gray-500">Start earning points</span>
+              <div className="font-bold text-gray-900 block text-base mb-1">Ways to earn</div>
+              <div className="text-sm text-gray-500">Start earning points</div>
             </div>
           </div>
-          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors" />
+          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
         </button>
 
         {/* Ways to redeem */}
         <button
           onClick={() => setCurrentView('redeem')}
-          className="w-full flex items-center justify-between p-5 bg-white rounded-xl border-2 border-gray-200 hover:border-pink-400 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 transition-all shadow-sm hover:shadow-md group"
+          className="w-full flex items-center justify-between p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-black hover:shadow-2xl transition-all shadow-md group hover:scale-[1.02]"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-              <Award className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md p-3">
+              <Award className="w-8 h-8 text-black" />
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-900 block">Ways to redeem</span>
-              <span className="text-xs text-gray-500">Claim your rewards</span>
+              <div className="font-bold text-gray-900 block text-base mb-1">Ways to redeem</div>
+              <div className="text-sm text-gray-500">Claim your rewards</div>
             </div>
           </div>
-          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors" />
+          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
         </button>
       </div>
 
       {/* Referrals */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Referrals</h3>
+      <div className="mt-8">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md p-2">
+            <Users className="w-6 h-6 text-black" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900">Referrals</h3>
         </div>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-6 leading-relaxed text-base">
           Give your friends a reward and claim your own when they make a purchase.
         </p>
 
-        <div className="space-y-3 mb-4">
-          <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-            <Gift className="w-6 h-6 text-green-600 mt-1" />
-            <div>
-              <div className="font-medium text-gray-900">They get</div>
-              <div className="text-green-600 font-semibold">₹200 off coupon</div>
+        <div className="space-y-4 mb-6">
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 shadow-md hover:shadow-lg transition-all">
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 p-3">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <div className="font-bold text-gray-900 text-lg mb-1">They get</div>
+              <div className="text-green-600 font-extrabold text-2xl">₹200 off coupon</div>
+              <p className="text-sm text-gray-600 mt-1">On their first order</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-            <Gift className="w-6 h-6 text-blue-600 mt-1" />
-            <div>
-              <div className="font-medium text-gray-900">You get</div>
-              <div className="text-blue-600 font-semibold">500 Points</div>
+          <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 shadow-md hover:shadow-lg transition-all">
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 p-3">
+              <CheckCircle className="w-8 h-8 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <div className="font-bold text-gray-900 text-lg mb-1">You get</div>
+              <div className="text-blue-600 font-extrabold text-2xl">500 Points</div>
+              <p className="text-sm text-gray-600 mt-1">When they make a purchase</p>
             </div>
           </div>
         </div>
 
         <button
           onClick={() => setCurrentView('referrals')}
-          className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all"
+          className="w-full py-4 px-6 bg-black hover:bg-gray-900 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95"
         >
-          View Referral Details
+          <span className="flex items-center justify-center gap-2.5">
+            <Users className="w-5 h-5 text-white" />
+            View Referral Details
+          </span>
         </button>
       </div>
 
       {/* Footer */}
-      <div className="text-center pt-4 border-t border-gray-200">
+      <div className="text-center pt-6 mt-8 border-t border-gray-200">
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
           <Award className="w-4 h-4" />
           <span>We reward with Smile</span>
@@ -210,7 +229,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
   const renderEarn = () => (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => setCurrentView('home')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -220,7 +239,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         <h2 className="text-2xl font-bold text-gray-900">Ways to earn</h2>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {earnActions.map((action, index) => (
           <div
             key={index}
@@ -237,7 +256,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         ))}
       </div>
 
-      <div className="bg-purple-50 rounded-lg p-4 text-center">
+      <div className="bg-purple-50 rounded-lg p-5 text-center border border-purple-100 mt-6">
         <p className="text-purple-900 font-medium">
           Join now for free to start earning
         </p>
@@ -247,7 +266,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
   const renderRedeem = () => (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => setCurrentView('home')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -257,7 +276,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         <h2 className="text-2xl font-bold text-gray-900">Ways to redeem</h2>
       </div>
 
-      <div className="bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl p-6 text-center mb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl p-6 text-center mb-8 shadow-lg">
         <div className="text-sm text-white/90 mb-2 font-medium">Your Points Balance</div>
         <div className="text-4xl font-extrabold text-white">{userRewards?.totalPoints || 0}</div>
         <div className="text-sm text-white/80 mt-1">Available Points</div>
@@ -276,7 +295,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
                   : 'border-gray-200 opacity-75'
               }`}
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-5">
                 <div className="flex items-start gap-4 flex-1">
                   <div className="text-5xl">{reward.icon}</div>
                   <div className="flex-1">
@@ -286,7 +305,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-lg text-pink-600">{reward.points}</span>
                   <span className="text-sm text-gray-500">Points</span>
@@ -312,7 +331,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
   const renderReferrals = () => (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => setCurrentView('home')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -325,14 +344,14 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
       <div className="bg-gradient-to-br from-pink-500 via-purple-500 to-pink-500 rounded-2xl p-6 shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-600/20 to-purple-600/20"></div>
         <div className="relative z-10">
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-5">
             <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
               <Users className="w-5 h-5 text-white" />
             </div>
             <h3 className="text-lg font-bold text-white">Your Referral Code</h3>
           </div>
           
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 mb-4 shadow-lg">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 mb-5 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="text-2xl font-bold text-gray-900 tracking-wider font-mono">
                 {userRewards?.referralCode}
@@ -364,9 +383,9 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         </div>
       </div>
 
-      <div>
-        <h3 className="font-bold text-gray-900 mb-3">How it works</h3>
-        <div className="space-y-3">
+      <div className="mt-6">
+        <h3 className="font-bold text-gray-900 mb-4">How it works</h3>
+        <div className="space-y-4">
           <div className="flex gap-3 items-start">
             <div className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
               1
@@ -399,7 +418,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         </div>
       </div>
 
-      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-5 mt-6">
         <div className="flex items-start gap-3">
           <Gift className="w-6 h-6 text-green-600 flex-shrink-0" />
           <div>
@@ -415,7 +434,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
   const renderHistory = () => (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => setCurrentView('home')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -425,7 +444,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         <h2 className="text-2xl font-bold text-gray-900">Points History</h2>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {userRewards?.actions.slice(0, 10).map((action) => (
           <div
             key={action.id}
@@ -444,9 +463,9 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
                 )}
               </div>
               <div className="flex-1">
-                <div className="font-bold text-gray-900">{action.action}</div>
-                <div className="text-sm text-gray-600 mt-1">{action.description}</div>
-                <div className="text-xs text-gray-400 mt-2">
+                <div className="font-bold text-gray-900 mb-1">{action.action}</div>
+                <div className="text-sm text-gray-600 mt-2 leading-relaxed">{action.description}</div>
+                <div className="text-xs text-gray-400 mt-3">
                   {new Date(action.date).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 
@@ -473,31 +492,31 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 px-4 py-6 sm:py-8">
+      {/* Back to Home Button - Outside Main Container */}
+      <div className="max-w-2xl mx-auto mb-6">
+        <button 
+          onClick={onBack} 
+          className="group inline-flex items-center gap-3 px-6 py-3.5 bg-white hover:bg-black hover:text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-black active:scale-95"
+        >
+          <ArrowLeft className="w-5 h-5 text-black group-hover:text-white transition-colors" />
+          <span className="text-base font-bold text-black group-hover:text-white transition-colors">Back to Home</span>
+        </button>
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Main Card */}
-        <div className="bg-gradient-to-br from-white via-pink-50/30 to-purple-50/30 rounded-3xl shadow-2xl border border-pink-100/50 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-900 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 p-6 flex items-center justify-between relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-600/20 to-purple-600/20"></div>
-            <div className="relative z-10 flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Gift className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-white">
-                Thread Trends Loyalty
-              </h2>
-            </div>
-            <button
-              onClick={onBack}
-              className="relative z-10 p-2 hover:bg-white/20 rounded-full transition-all backdrop-blur-sm"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
+          <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-gray-700/20 via-transparent to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-gray-800/30 to-transparent rounded-full blur-3xl"></div>
+            
+           
           </div>
 
           {/* Content */}
-          <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto bg-white/50 backdrop-blur-sm">
+          <div className="p-6 sm:p-8 pt-2 max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             {currentView === 'home' && renderHome()}
             {currentView === 'earn' && renderEarn()}
             {currentView === 'redeem' && renderRedeem()}
@@ -507,22 +526,18 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
           {/* Bottom Navigation (for home view) */}
           {currentView === 'home' && (
-            <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4">
+            <div className="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-t-2 border-gray-200 p-4 sm:p-6">
               <button
                 onClick={() => setCurrentView('history')}
-                className="w-full py-3 px-4 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-900 font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+                className="w-full py-4 px-6 bg-black hover:bg-gray-900 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95"
               >
-                View Points History
+                <span className="flex items-center justify-center gap-2.5">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                  View Points History
+                </span>
               </button>
             </div>
           )}
-        </div>
-
-        {/* Back to Home */}
-        <div className="mt-6 text-center">
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-900 text-sm">
-            ← Back to Home
-          </button>
         </div>
       </div>
     </div>
