@@ -90,7 +90,7 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
 
   return (
     <section className="min-h-screen bg-white" ref={productDetailRef}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{marginTop : '1.1rem'}}>
         {/* Back Button */}
         <button 
           onClick={onBack} 
