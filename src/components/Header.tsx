@@ -120,7 +120,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Search Dropdown */}
               {showSearch && (
-                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 z-50" style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-6rem' }}>
                   <h3 className="text-xl mb-4 text-gray-900">Search Products</h3>
                   <form onSubmit={handleSearch}>
                     <div className="flex gap-2">
@@ -160,7 +160,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Wishlist Dropdown */}
               {showWishlist && (
-                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50"style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-3rem' }}>
                   <h3 className="text-2xl mb-6 text-red-500"> Wishlist ({getWishlistCount()})</h3>
                   {getWishlistCount() === 0 ? (
                     <p className="text-gray-500 text-center py-8">Your wishlist is empty</p>
@@ -208,7 +208,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Account Menu Dropdown */}
               {showAccountMenu && (
-                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn">
+                <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn"style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '-2rem' }}>
                   {user ? (
                     <>
                       <div className="mb-4 pb-4 border-b border-gray-200">
@@ -311,7 +311,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
               {/* Cart Dropdown */}
               {showCart && (
-                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50">
+                <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white shadow-xl border border-gray-200 p-6 animate-fadeIn z-50"style={{ animation: 'fadeIn 0.2s ease-out', marginLeft: '15rem', marginRight: '0rem' }}>
                   <h3 className="text-xl mb-4">Shopping Cart ({getCartCount()} items)</h3>
                   {getCartCount() === 0 ? (
                     <p className="text-gray-500 text-center py-8">Your cart is empty</p>
