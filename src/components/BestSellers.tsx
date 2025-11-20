@@ -1,5 +1,6 @@
 import { ProductCard } from './ProductCard';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
 const bestSellerProducts = [
   {
@@ -75,36 +76,160 @@ interface BestSellersProps {
 }
 
 export function BestSellers({ onNavigateShop }: BestSellersProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Number of items to show per view based on screen size
+  const getItemsPerView = () => {
+    if (typeof window === 'undefined') return 4;
+    if (window.innerWidth < 640) return 1; // mobile
+    if (window.innerWidth < 768) return 2; // tablet
+    if (window.innerWidth < 1024) return 3; // small desktop
+    return 4; // large desktop
+  };
+
+  const [itemsPerView, setItemsPerView] = useState(getItemsPerView());
+  
+  // Create extended array with clones for infinite loop
+  const extendedProducts = [
+    ...bestSellerProducts,
+    ...bestSellerProducts,
+    ...bestSellerProducts
+  ];
+
+  // Update items per view on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerView(getItemsPerView());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Set initial position to middle set
+  useEffect(() => {
+    setCurrentIndex(bestSellerProducts.length);
+  }, [itemsPerView]);
+
+  // Handle infinite loop - check position after transition
+  useEffect(() => {
+    const carousel = carouselRef.current?.querySelector('.carousel-track') as HTMLElement;
+    if (!carousel) return;
+
+    const handleTransitionEnd = () => {
+      // If we're at or past the end of the second set, jump to first set
+      if (currentIndex >= bestSellerProducts.length * 2) {
+        carousel.style.transition = 'none';
+        setCurrentIndex(bestSellerProducts.length);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            carousel.style.transition = 'transform 500ms ease-out';
+          });
+        });
+      }
+      // If we're before the first set, jump to second set
+      else if (currentIndex < bestSellerProducts.length) {
+        carousel.style.transition = 'none';
+        setCurrentIndex(bestSellerProducts.length * 2 - 1);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            carousel.style.transition = 'transform 500ms ease-out';
+          });
+        });
+      }
+    };
+
+    carousel.addEventListener('transitionend', handleTransitionEnd);
+    return () => carousel.removeEventListener('transitionend', handleTransitionEnd);
+  }, [currentIndex]);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (isAutoPlaying) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrentIndex((prev) => prev + 1);
+      }, 4000);
+    }
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [isAutoPlaying]);
+
+  const handlePrevious = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => prev + 1);
+  };
+
   return (
-    <section id="best-sellers" className="py-20 bg-white">
+    <section id="best-sellers" className="py-16 sm:py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-12 text-center">
+        <div className="mb-10 sm:mb-12 text-center">
           <div className="inline-block mb-4">
             <span className="text-sm font-extrabold text-black tracking-widest uppercase">
               Best Sellers
             </span>
           </div>
-          <h2 className="text-5xl sm:text-6xl mb-6 relative">Most Loved Pieces</h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 relative">Most Loved Pieces</h2>
+          <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
             Our community's favorites. These pieces sell out fast
           </p>
         </div>
 
-        {/* Products Grid - no horizontal scrollbar */}
-        <div className="mb-14">
-           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-start">
-            {bestSellerProducts.map((product) => (
-              <div key={product.id} className="w-full">
-                {/* ProductCard should handle image & content sizing internally.
-                    Using w-full here ensures grid column sizing controls width. */}
-                <ProductCard {...product} id={product.id} />
-              </div>
-            ))}
+        {/* Carousel Container */}
+        <div className="relative mb-10 sm:mb-14 flex items-center gap-4">
+          {/* Left Navigation Button */}
+          <button
+            onClick={handlePrevious}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors"
+            aria-label="Previous products"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Carousel Track */}
+          <div className="flex-1 overflow-hidden" ref={carouselRef}>
+            <div
+              className="carousel-track flex transition-transform duration-500 ease-out"
+              style={{
+                transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`
+              }}
+            >
+              {extendedProducts.map((product, index) => (
+                <div
+                  key={`${product.id}-${index}`}
+                  className="flex-shrink-0 px-2 sm:px-3 md:px-4"
+                  style={{ width: `${100 / itemsPerView}%` }}
+                >
+                  <ProductCard {...product} id={product.id} />
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Right Navigation Button */}
+          <button
+            onClick={handleNext}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors"
+            aria-label="Next products"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
+
         {/* CTA Button */}
-        <div className="text-center">
+        <div className="text-center mb-10 sm:mb-14">
           <button
             onClick={onNavigateShop}
             className="group inline-flex items-center gap-1 px-8 py-3 bg-black text-white hover:bg-gray-900 hover:scale-105 hover:shadow-xl transition-all duration-300 rounded-md"
