@@ -110,10 +110,10 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Search */}
-            <div className="relative hidden sm:block" ref={searchMenuRef}>
+            <div className="relative" ref={searchMenuRef}>
               <button 
                 onClick={() => setShowSearch(!showSearch)}
-                className="hover:opacity-60 transition-opacity"
+                className="hover:opacity-60 transition-opacity p-1"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -145,19 +145,18 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
             </div>
             
             {/* Wishlist Dropdown */}
-            <div className="relative hidden sm:block" ref={wishlistMenuRef}>
+            <div className="relative" ref={wishlistMenuRef}>
               <button 
                 onClick={() => setShowWishlist(!showWishlist)}
-                className="hover:opacity-60 transition-opacity relative"
+                className="hover:opacity-60 transition-opacity relative p-1"
               >
                 <Heart className="w-5 h-5" />
                 {getWishlistCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 -left-1 bg-white text-red-500 border-red-500 text-xs w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                     {getWishlistCount()}
                   </span>
                 )}
               </button>
-
 
               {/* Wishlist Dropdown */}
               {showWishlist && (
@@ -199,10 +198,10 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
             </div>
             
             {/* Account Dropdown */}
-            <div className="relative hidden sm:block" ref={accountMenuRef}>
+            <div className="relative" ref={accountMenuRef}>
               <button 
                 onClick={() => setShowAccountMenu(!showAccountMenu)}
-                className="hover:opacity-60 transition-opacity"
+                className="hover:opacity-60 transition-opacity p-1"
               >
                 <User className="w-5 h-5" />
               </button>
@@ -384,6 +383,63 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
               >
                 Contact
               </button>
+              
+              {/* Mobile Icons Section */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                {/* Search Icon */}
+                <button 
+                  onClick={() => {
+                    setShowSearch(!showSearch);
+                    setIsMenuOpen(false);
+                  }}
+                  className="hover:opacity-60 transition-opacity p-2"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+                
+                {/* Wishlist Icon */}
+                <button 
+                  onClick={() => {
+                    setShowWishlist(!showWishlist);
+                    setIsMenuOpen(false);
+                  }}
+                  className="hover:opacity-60 transition-opacity p-2 relative"
+                >
+                  <Heart className="w-5 h-5" />
+                  {getWishlistCount() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                      {getWishlistCount()}
+                    </span>
+                  )}
+                </button>
+                
+                {/* Account Icon */}
+                <button 
+                  onClick={() => {
+                    setShowAccountMenu(!showAccountMenu);
+                    setIsMenuOpen(false);
+                  }}
+                  className="hover:opacity-60 transition-opacity p-2"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+                
+                {/* Cart Icon */}
+                <button 
+                  onClick={() => {
+                    setShowCart(!showCart);
+                    setIsMenuOpen(false);
+                  }}
+                  className="hover:opacity-60 transition-opacity p-2 relative"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {getCartCount() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                      {getCartCount()}
+                    </span>
+                  )}
+                </button>
+              </div>
               
               {/* Mobile Account Section */}
               <div className="pt-4 border-t border-gray-200 space-y-3">
