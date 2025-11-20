@@ -1169,16 +1169,26 @@ export function AdminDashboard() {
         </div>
 
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+         <div className="relative">
+          {/* Fix 1: Added 'pointer-events-none' 
+            This ensures clicks on the icon pass through to the input.
+          */}
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          
           <input
             type="text"
-            placeholder="Search products..."
+            className="w-full px-10 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+            placeholder="Search Products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white"
+            /* Fix 2: Ensure 'pl-10' (padding-left) is sufficient. 
+              pl-10 = 2.5rem. Icon is left-3 (0.75rem) + w-5 (1.25rem) = ~2rem coverage.
+              Added focus ring for better visibility.
+            */
+           
           />
         </div>
+        
 
         {/* Products Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
