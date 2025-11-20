@@ -1,6 +1,6 @@
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface ShopByChoiceProps {
   onNavigateShop: () => void;
@@ -41,10 +41,59 @@ const categories = [
 
 export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isScrollingRef = useRef(false);
+
+  // Create extended array with clones for infinite loop
+  const extendedCategories = [...categories, ...categories, ...categories];
+
+  // Auto-scroll to middle set on mount to enable infinite scroll in both directions
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const singleSetWidth = (340 * categories.length); // card width (320) + gap (20)
+      scrollContainerRef.current.scrollLeft = singleSetWidth;
+    }
+  }, []);
+
+  // Handle infinite scroll loop with smooth repositioning
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isScrollingRef.current) return;
+      
+      const scrollLeft = container.scrollLeft;
+      const singleSetWidth = (340 * categories.length);
+      
+      // If scrolled past the end of the second set, jump to first set
+      if (scrollLeft >= singleSetWidth * 2 - 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth;
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
+      }
+      // If scrolled before the first set, jump to second set
+      else if (scrollLeft <= 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth * 2 - 340;
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 320;
+    if (scrollContainerRef.current && !isScrollingRef.current) {
+      const scrollAmount = 340; // Adjusted for card width + gap
       const newScrollPosition = direction === 'left' 
         ? scrollContainerRef.current.scrollLeft - scrollAmount
         : scrollContainerRef.current.scrollLeft + scrollAmount;
@@ -101,9 +150,9 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
               msOverflowStyle: 'none',
             }}
           >
-            {categories.map((category) => (
+            {extendedCategories.map((category, index) => (
               <button
-                key={category.id}
+                key={`${category.id}-${index}`}
                 onClick={onNavigateShop}
                 className="flex-shrink-0 group"
               >
