@@ -62,7 +62,7 @@ export function ProductCard({ id, image, name, price, originalPrice, isSale, cat
           className={`absolute top-3 right-3 w-10 h-10 border rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
             isWishlisted 
               ? 'bg-black border-black text-white opacity-100' 
-              : 'bg-white/95 border-black/10 opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white'
+              : 'bg-white/95 border-black/10 opacity-100 hover:bg-black hover:text-white'
           } ${justAdded ? 'animate-bounce' : ''}`}
         >
           <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
