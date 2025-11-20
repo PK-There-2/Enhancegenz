@@ -450,7 +450,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping method</h2>
 
-                {/* Single option styled like screenshot */}
+            
                 <div className={`border rounded-lg overflow-hidden ${shippingMethod === 'free' ? 'border-blue-500 ring-1 ring-blue-100 bg-white' : 'border-gray-300'}`}>
                   <label
                     className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -462,12 +462,12 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                         name="shippingMethod"
                         checked={shippingMethod === 'free'}
                         onChange={() => setShippingMethod('free')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3" style = {{ marginLeft : '1rem' }}
                       />
-                      <span className="font-medium text-gray-900 uppercase tracking-wide">Shipping</span>
+                      <span className="font-medium text-gray-900 uppercase tracking-wide" style= {{ height : '2.6rem' , marginTop: '1rem' , marginLeft : '0.7rem'}}>Shipping</span>
                     </div>
 
-                    <span className="font-medium text-gray-900">FREE</span>
+                    <span className="font-medium text-gray-900" style = {{ marginRight : '1.3rem' }}>FREE</span>
                   </label>
                 </div>
               </div>
