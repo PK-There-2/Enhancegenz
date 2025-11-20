@@ -251,10 +251,10 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
             className="flex items-center justify-between p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-black hover:shadow-2xl transition-all shadow-md hover:scale-[1.02]"
           >
             <div className="flex items-center gap-4">
-              <div className="text-4xl">{action.icon}</div>
+              <div className="text-3xl">{action.icon}</div>
               <span className="font-bold text-gray-900 text-base">{action.action}</span>
             </div>
-            <div className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-lg">
+            <div className="bg-black text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
               +{action.points}
             </div>
           </div>
