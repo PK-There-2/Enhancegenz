@@ -4,15 +4,14 @@ import { useAuth } from './AuthContext.tsx';
 import { useCart } from './CartContext.tsx';
 import { useWishlist } from './WishlistContext';
 
-
 interface HeaderProps {
-  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page';
-  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page') => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login') => void;
   onSearch?: (query: string) => void;
 }
 
 export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
-  const { user, signOut, openAuthWindow } = useAuth();
+  const { user, signOut } = useAuth();
   const { getCartCount } = useCart();
   const { getWishlistCount, wishlist, removeFromWishlist } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,6 +54,12 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
       }
       setShowSearch(false);
     }
+  };
+
+  const handleSignInClick = () => {
+    setShowAccountMenu(false);
+    setIsMenuOpen(false);
+    onNavigate('login');
   };
 
   return (
@@ -257,10 +262,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                       <h3 className="text-xl mb-4">Account</h3>
                       
                       <button 
-                        onClick={() => {
-                          openAuthWindow();
-                          setShowAccountMenu(false);
-                        }}
+                        onClick={handleSignInClick}
                         className="w-full py-4 bg-black text-white hover:bg-gray-800 transition-colors mb-4"
                       >
                         Sign In / Sign Up
@@ -268,20 +270,14 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
 
                       <div className="grid grid-cols-2 gap-3">
                         <button 
-                          onClick={() => {
-                            openAuthWindow();
-                            setShowAccountMenu(false);
-                          }}
+                          onClick={handleSignInClick}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
                         >
                           <Package className="w-5 h-5" />
                           <span>Orders</span>
                         </button>
                         <button 
-                          onClick={() => {
-                            openAuthWindow();
-                            setShowAccountMenu(false);
-                          }}
+                          onClick={handleSignInClick}
                           className="flex items-center justify-center gap-2 py-4 border-2 border-black hover:bg-gray-50 transition-colors"
                         >
                           <UserCircle className="w-5 h-5" />
@@ -423,30 +419,21 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                 ) : (
                   <>
                     <button 
-                      onClick={() => {
-                        openAuthWindow();
-                        setIsMenuOpen(false);
-                      }}
+                      onClick={handleSignInClick}
                       className="w-full py-3 bg-black text-white"
                     >
                       Sign In / Sign Up
                     </button>
                     <div className="grid grid-cols-2 gap-3">
                       <button 
-                        onClick={() => {
-                          openAuthWindow();
-                          setIsMenuOpen(false);
-                        }}
+                        onClick={handleSignInClick}
                         className="flex items-center justify-center gap-2 py-3 border border-black"
                       >
                         <Package className="w-4 h-4" />
                         <span className="text-sm">Orders</span>
                       </button>
                       <button 
-                        onClick={() => {
-                          openAuthWindow();
-                          setIsMenuOpen(false);
-                        }}
+                        onClick={handleSignInClick}
                         className="flex items-center justify-center gap-2 py-3 border border-black"
                       >
                         <UserCircle className="w-4 h-4" />
