@@ -225,7 +225,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                         >
-                          <UserCircle className="w-4 h-4" />
+                          <UserCircle className="w-5 h-5" />
                           <span>My Account</span>
                         </button>
                         <button 
@@ -236,7 +236,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                         >
-                          <Package className="w-4 h-4" />
+                          <Package className="w-5 h-5" />
                           <span>My Orders</span>
                         </button>
                         {user.role === 'admin' && (
@@ -247,7 +247,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                             }}
                             className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-left"
                           >
-                            <Shield className="w-4 h-4" />
+                            <Shield className="w-5 h-5" />
                             <span>Admin Dashboard</span>
                           </button>
                         )}
@@ -464,7 +464,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           onNavigate('admin');
                           setIsMenuOpen(false);
                         }}
-                        className="w-full py-3 bg-blue-600 text-white"
+                        className="w-full py-3 bg-blue-600 border border-black hover:bg-gray-50 text-black"
                       >
                         Admin Dashboard
                       </button>
