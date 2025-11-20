@@ -28,6 +28,14 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
   const [qty, setQty] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const { user } = useAuth();
+  const productDetailRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top when product changes
+  useEffect(() => {
+    if (productDetailRef.current) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [product.id]);
 
   // Load related products from localStorage
   useEffect(() => {
@@ -81,7 +89,7 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
   const sizes: Array<'S' | 'M' | 'L' | 'XL' | 'XXL'> = ['S', 'M', 'L', 'XL', 'XXL'];
 
   return (
-    <section className="min-h-screen bg-white">
+    <section className="min-h-screen bg-white" ref={productDetailRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button 
