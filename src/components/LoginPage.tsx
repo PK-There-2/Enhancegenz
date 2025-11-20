@@ -53,7 +53,7 @@ export function LoginPage({ onBack, onSuccess }: LoginPageProps) {
   
 
         {/* Login Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 " style = {{ marginTop: '-40px' }}>
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {isSignup ? 'Create Account' : 'Welcome Back'}
