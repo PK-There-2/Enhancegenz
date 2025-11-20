@@ -27,7 +27,7 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
   const [activeSize, setActiveSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL'>('S');
   const [qty, setQty] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
-  const { user, openAuthWindow } = useAuth();
+  const { user } = useAuth();
 
   // Load related products from localStorage
   useEffect(() => {
@@ -50,7 +50,7 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
   const handleBuyNow = () => {
     if (!user) {
       alert('Please sign in to continue with your purchase');
-      openAuthWindow();
+      // We don't have access to navigation here, so we'll just show the alert
       return;
     }
     
@@ -126,12 +126,12 @@ export function ProductDetail({ product, onBack, onAddToCart, onNavigateCheckout
             {/* Size Selection */}
             <div>
               <h3 className="text-sm font-normal mb-4 text-gray-900">SIZE</h3>
-              <div className="flex gap-4 ">
+              <div className="flex gap-2 flex-wrap">
                 {sizes.map((s) => (
                   <button
                     key={s}
                     onClick={() => setActiveSize(s)}
-                    className={`min-w-[80px] px-10 py-4 text-sm font-normal transition-all rounded-2xl
+                    className={`min-w-[60px] px-4 py-3 text-sm font-normal transition-all rounded-2xl flex-1
                       ${
                       activeSize === s 
                         ? 'bg-black text-white'  
@@ -272,5 +272,3 @@ function FaqItem({ question, children }: { question: string; children: React.Rea
     </div>
   );
 }
-
-
