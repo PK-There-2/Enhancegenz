@@ -539,14 +539,14 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         className="back-to-home-button"
         style={{
           position: 'fixed',
-          top: '2rem',
-          left: '2.5rem',
+          top: '1rem',
+          left: '3rem',
           zIndex: '50',
           display: 'inline-flex',
           alignItems: 'center',
           gap: '1rem',
           padding: '0.75rem 2rem',
-          backgroundColor: '#000',
+          backgroundColor: 'transparent',
           color: '#fff',
           borderRadius: '9999px',
           boxShadow: '0 10px 15px -3px rgba(18, 18, 18, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
@@ -555,18 +555,18 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           cursor: 'pointer'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#1a1a1a';
+          e.currentTarget.style.backgroundColor = 'transparent';
           e.currentTarget.style.transform = 'scale(1.05)';
           e.currentTarget.style.boxShadow = '0 30px 35px -5px rgba(68, 0, 255, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#000';
+          e.currentTarget.style.backgroundColor = 'transparent';
           e.currentTarget.style.transform = 'scale(1)';
           e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(86, 104, 183, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
         }}
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span className="font-medium">Back to Home</span>
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-black" />
+        <span className="font-medium text-black">Back to Home</span>
       </button>
 
       <div className="max-w-2xl mx-auto mt-16">
