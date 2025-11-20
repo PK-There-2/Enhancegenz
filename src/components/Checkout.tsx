@@ -486,9 +486,9 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                         name="paymentMethod"
                         checked={paymentMethod === 'upi'}
                         onChange={() => setPaymentMethod('upi')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3" style = {{ marginLeft : '1rem' }}
                       />
-                      <div className="ml-1 font-medium text-gray-900 uppercase">UPI PAYMENTS</div>
+                      <div className="ml-1 font-medium text-gray-900 uppercase" style= {{ height : '2.6rem' , marginTop: '1rem' , marginLeft : '0.7rem'}}>UPI PAYMENTS</div>
                     </label>
 
                     {/* UPI instruction block that appears like the screenshot */}
@@ -508,9 +508,9 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                         name="paymentMethod"
                         checked={paymentMethod === 'cod'}
                         onChange={() => setPaymentMethod('cod')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3" style = {{ marginLeft : '1rem' }}
                       />
-                      <div className="ml-1 font-medium text-gray-900">Cash on Delivery (COD)</div>
+                      <div className="ml-1 font-medium text-gray-900" style= {{ height : '2.6rem' , marginTop: '1rem' , marginLeft : '0.7rem'}}>Cash on Delivery (COD)</div>
                     </label>
                   </div>
                 </div>
@@ -531,9 +531,9 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                       name="billingOption"
                       checked={formData.billingSameAsShipping}
                       readOnly
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3" style = {{ marginLeft : '1rem' }}
                     />
-                    <span className="text-gray-700">Same as shipping address</span>
+                    <span className="text-gray-700" style= {{ height : '2.6rem' , marginTop: '1rem' , marginLeft : '0.7rem'}}>Same as shipping address</span>
                   </label>
 
                   {/* Use a different billing address */}
@@ -546,9 +546,9 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                       name="billingOption"
                       checked={!formData.billingSameAsShipping}
                       readOnly
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 mr-3" style = {{ marginLeft : '1rem' }}
                     />
-                    <span className="text-gray-700">Use a different billing address</span>
+                    <span className="text-gray-700" style= {{ height : '2.6rem' , marginTop: '1rem' , marginLeft : '0.7rem'}}>Use a different billing address</span>
                   </label>
 
                   {/* When user chooses different billing address, show the fields (keeps your original inputs) */}
