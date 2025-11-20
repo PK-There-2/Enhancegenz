@@ -84,6 +84,7 @@ export function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [activeSection, setActiveSection] = useState<'dashboard' | 'orders' | 'products' | 'customers' | 'marketing' | 'reports' | 'rewards'>('dashboard');
+  const [reportSubSection, setReportSubSection] = useState<'overview' | 'netmargin' | 'salesbycategory'>('overview');
   const [isAddingReward, setIsAddingReward] = useState(false);
   const { userRewards, openRewardsWindow } = useRewards();
 
@@ -623,13 +624,541 @@ export function AdminDashboard() {
     return <NotificationPanel accessToken={token} />;
   };
 
-  const renderReportsSection = () => (
-    <div className="bg-white rounded-xl p-12 text-center shadow-md">
-      <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold mb-2 text-gray-900">Detailed Reports</h3>
-      <p className="text-gray-500">Advanced reporting features coming soon</p>
-    </div>
-  );
+  const renderReportsSection = () => {
+    // Calculate Net Margin Data
+    const calculateNetMargin = () => {
+      const totalRevenue = products.reduce((sum, p) => {
+        const productStock = p.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+        return sum + (p.price * productStock);
+      }, 0);
+      
+      const totalCost = products.reduce((sum, p) => {
+        const productStock = p.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+        const costPrice = p.originalPrice || p.price * 0.6; // Assume 40% margin if no original price
+        return sum + (costPrice * productStock);
+      }, 0);
+      
+      const grossProfit = totalRevenue - totalCost;
+      const netMarginPercentage = totalRevenue > 0 ? ((grossProfit / totalRevenue) * 100).toFixed(2) : 0;
+      
+      return {
+        totalRevenue,
+        totalCost,
+        grossProfit,
+        netMarginPercentage,
+        productsAnalyzed: products.length
+      };
+    };
+
+    // Calculate Sales by Category Data
+    const calculateSalesByCategory = () => {
+      const categoryData = products.reduce((acc, p) => {
+        const productStock = p.sizes?.reduce((s, size) => s + size.stock, 0) || 0;
+        const revenue = p.price * productStock;
+        
+        if (!acc[p.category]) {
+          acc[p.category] = {
+            category: p.category,
+            totalRevenue: 0,
+            totalProducts: 0,
+            totalStock: 0,
+            avgPrice: 0
+          };
+        }
+        
+        acc[p.category].totalRevenue += revenue;
+        acc[p.category].totalProducts += 1;
+        acc[p.category].totalStock += productStock;
+        
+        return acc;
+      }, {} as Record<string, {
+        category: string;
+        totalRevenue: number;
+        totalProducts: number;
+        totalStock: number;
+        avgPrice: number;
+      }>);
+      
+      // Calculate average price and convert to array
+      const categoriesArray = Object.values(categoryData).map(cat => ({
+        ...cat,
+        avgPrice: cat.totalProducts > 0 ? cat.totalRevenue / cat.totalStock : 0
+      })).sort((a, b) => b.totalRevenue - a.totalRevenue);
+      
+      const totalRevenue = categoriesArray.reduce((sum, cat) => sum + cat.totalRevenue, 0);
+      
+      return categoriesArray.map(cat => ({
+        ...cat,
+        percentage: totalRevenue > 0 ? ((cat.totalRevenue / totalRevenue) * 100).toFixed(2) : 0
+      }));
+    };
+
+    const netMarginData = calculateNetMargin();
+    const salesByCategoryData = calculateSalesByCategory();
+
+    if (reportSubSection === 'netmargin') {
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <TrendingUp className="w-8 h-8 text-emerald-600" />
+                Net Margin Analysis
+              </h2>
+              <p className="text-sm text-gray-500 mt-2">Analyze your profit margins and revenue breakdown</p>
+            </div>
+            <button
+              onClick={() => setReportSubSection('overview')}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" />
+              Back to Reports
+            </button>
+          </div>
+
+          {/* Key Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-6 border border-emerald-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-emerald-700">Total Revenue</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">₹{netMarginData.totalRevenue.toLocaleString()}</h3>
+                  <div className="flex items-center gap-2 text-sm text-emerald-600 mt-3">
+                    <ArrowUpRight className="w-4 h-4" />
+                    <span>Potential earnings</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-600">
+                  <IndianRupee className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-rose-50 to-white rounded-2xl p-6 border border-rose-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-rose-700">Total Cost</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">₹{netMarginData.totalCost.toLocaleString()}</h3>
+                  <div className="flex items-center gap-2 text-sm text-rose-600 mt-3">
+                    <ArrowDownRight className="w-4 h-4" />
+                    <span>Cost basis</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-600">
+                  <Package className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border border-blue-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-700">Gross Profit</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">₹{netMarginData.grossProfit.toLocaleString()}</h3>
+                  <div className="flex items-center gap-2 text-sm text-blue-600 mt-3">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Revenue - Cost</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600">
+                  <TrendingUp className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border border-purple-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-purple-700">Net Margin</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">{netMarginData.netMarginPercentage}%</h3>
+                  <div className="flex items-center gap-2 text-sm text-purple-600 mt-3">
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Profit margin</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600">
+                  <BarChart3 className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Margin Analysis Chart */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Margin Breakdown</h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Revenue</span>
+                    <span className="text-sm font-bold text-emerald-600">100%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 w-full" />
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Cost</span>
+                    <span className="text-sm font-bold text-rose-600">
+                      {netMarginData.totalRevenue > 0 ? ((netMarginData.totalCost / netMarginData.totalRevenue) * 100).toFixed(2) : 0}%
+                    </span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-rose-500 to-rose-600" 
+                      style={{ width: `${netMarginData.totalRevenue > 0 ? (netMarginData.totalCost / netMarginData.totalRevenue) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Profit</span>
+                    <span className="text-sm font-bold text-blue-600">{netMarginData.netMarginPercentage}%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600" 
+                      style={{ width: `${netMarginData.netMarginPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200">
+                <p className="text-xs text-gray-500 mb-2">Products Analyzed</p>
+                <p className="text-2xl font-bold text-gray-900">{netMarginData.productsAnalyzed}</p>
+              </div>
+            </div>
+
+            {/* Top Margin Products */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Top Margin Products</h3>
+              {products.length > 0 ? (
+                <div className="space-y-3">
+                  {products
+                    .map(p => ({
+                      ...p,
+                      margin: p.originalPrice ? ((p.price - (p.originalPrice * 0.6)) / p.price) * 100 : 40
+                    }))
+                    .sort((a, b) => b.margin - a.margin)
+                    .slice(0, 6)
+                    .map((product) => (
+                      <div key={product.id} className="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900 text-sm">{product.name}</p>
+                          <p className="text-xs text-gray-500">{product.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-emerald-600">{product.margin.toFixed(1)}%</p>
+                          <p className="text-xs text-gray-500">₹{product.price}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>No products to analyze</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (reportSubSection === 'salesbycategory') {
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <BarChart3 className="w-8 h-8 text-blue-600" />
+                Sales by Category
+              </h2>
+              <p className="text-sm text-gray-500 mt-2">Analyze sales performance across product categories</p>
+            </div>
+            <button
+              onClick={() => setReportSubSection('overview')}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" />
+              Back to Reports
+            </button>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border border-blue-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-700">Total Categories</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">{salesByCategoryData.length}</h3>
+                  <div className="flex items-center gap-2 text-sm text-blue-600 mt-3">
+                    <span>Active product groups</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600">
+                  <LayoutDashboard className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-6 border border-emerald-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-emerald-700">Top Category</p>
+                  <h3 className="text-xl font-bold text-gray-900 mt-2">
+                    {salesByCategoryData[0]?.category || 'N/A'}
+                  </h3>
+                  <div className="flex items-center gap-2 text-sm text-emerald-600 mt-3">
+                    <span>₹{salesByCategoryData[0]?.totalRevenue.toLocaleString() || 0}</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-600">
+                  <TrendingUp className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border border-purple-200 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-purple-700">Total Products</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mt-2">{products.length}</h3>
+                  <div className="flex items-center gap-2 text-sm text-purple-600 mt-3">
+                    <span>Across all categories</span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600">
+                  <Package className="w-6 h-6" />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Performance Table */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Category Performance</h3>
+            {salesByCategoryData.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Category</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Products</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Stock</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Revenue</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Avg Price</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Share</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {salesByCategoryData.map((cat, idx) => {
+                      const colors = [
+                        'from-blue-500 to-blue-600',
+                        'from-emerald-500 to-emerald-600',
+                        'from-purple-500 to-purple-600',
+                        'from-rose-500 to-rose-600',
+                        'from-amber-500 to-amber-600',
+                      ];
+                      return (
+                        <tr key={cat.category} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${colors[idx % colors.length]}`} />
+                              <span className="font-medium text-gray-900">{cat.category}</span>
+                            </div>
+                          </td>
+                          <td className="text-right py-4 px-4 text-gray-900">{cat.totalProducts}</td>
+                          <td className="text-right py-4 px-4 text-gray-900">{cat.totalStock}</td>
+                          <td className="text-right py-4 px-4 font-semibold text-gray-900">₹{cat.totalRevenue.toLocaleString()}</td>
+                          <td className="text-right py-4 px-4 text-gray-700">₹{Math.round(cat.avgPrice).toLocaleString()}</td>
+                          <td className="text-right py-4 px-4">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                              {cat.percentage}%
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No category data available</p>
+                <p className="text-sm">Add products to see category breakdown</p>
+              </div>
+            )}
+          </div>
+
+          {/* Visual Distribution */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Revenue Distribution</h3>
+            {salesByCategoryData.length > 0 ? (
+              <div className="space-y-4">
+                {salesByCategoryData.map((cat, idx) => {
+                  const colors = [
+                    'from-blue-500 to-blue-600',
+                    'from-emerald-500 to-emerald-600',
+                    'from-purple-500 to-purple-600',
+                    'from-rose-500 to-rose-600',
+                    'from-amber-500 to-amber-600',
+                  ];
+                  return (
+                    <div key={cat.category}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">{cat.category}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-gray-500">₹{cat.totalRevenue.toLocaleString()}</span>
+                          <span className="text-sm font-bold text-gray-900">{cat.percentage}%</span>
+                        </div>
+                      </div>
+                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${colors[idx % colors.length]} transition-all duration-500`}
+                          style={{ width: `${cat.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>No data to display</p>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Reports Overview
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-blue-600" />
+            Reports & Analytics
+          </h2>
+          <p className="text-sm text-gray-500 mt-2">View detailed insights about your business performance</p>
+        </div>
+
+        {/* Report Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Net Margin Report */}
+          <button
+            onClick={() => setReportSubSection('netmargin')}
+            className="group bg-white rounded-2xl p-8 shadow-sm border border-gray-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 text-left"
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white">
+                <TrendingUp className="w-7 h-7" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Net Margin Analysis</h3>
+            <p className="text-sm text-gray-600 mb-4">Track your profit margins, revenue, and cost breakdown</p>
+            <div className="flex items-center gap-4 text-sm">
+              <div>
+                <p className="text-gray-500">Current Margin</p>
+                <p className="text-xl font-bold text-emerald-600">{calculateNetMargin().netMarginPercentage}%</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Gross Profit</p>
+                <p className="text-xl font-bold text-gray-900">₹{calculateNetMargin().grossProfit.toLocaleString()}</p>
+              </div>
+            </div>
+          </button>
+
+          {/* Sales by Category Report */}
+          <button
+            onClick={() => setReportSubSection('salesbycategory')}
+            className="group bg-white rounded-2xl p-8 shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 text-left"
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white">
+                <BarChart3 className="w-7 h-7" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Sales by Category</h3>
+            <p className="text-sm text-gray-600 mb-4">Analyze sales performance across different product categories</p>
+            <div className="flex items-center gap-4 text-sm">
+              <div>
+                <p className="text-gray-500">Categories</p>
+                <p className="text-xl font-bold text-blue-600">{calculateSalesByCategory().length}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Top Category</p>
+                <p className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
+                  {calculateSalesByCategory()[0]?.category || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[
+            {
+              label: 'Total Revenue Potential',
+              value: `₹${analytics.totalRevenue.toLocaleString()}`,
+              subtext: 'Based on current stock',
+              Icon: IndianRupee,
+              color: 'emerald'
+            },
+            {
+              label: 'Products Analyzed',
+              value: analytics.totalProducts,
+              subtext: 'Active inventory items',
+              Icon: Package,
+              color: 'blue'
+            },
+            {
+              label: 'Average Discount',
+              value: `${analytics.avgDiscount}%`,
+              subtext: `${analytics.productsOnSale} items on sale`,
+              Icon: TrendingUp,
+              color: 'purple'
+            },
+            {
+              label: 'Total Stock',
+              value: analytics.totalStock,
+              subtext: 'Units in inventory',
+              Icon: ShoppingBag,
+              color: 'rose'
+            }
+          ].map(({ label, value, subtext, Icon, color }) => (
+            <div
+              key={label}
+              className={`bg-gradient-to-br from-${color}-50 to-white rounded-2xl p-6 border border-${color}-200 shadow-sm`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full bg-${color}-100 text-${color}-600`}>
+                  <Icon className="w-5 h-5" />
+                </span>
+              </div>
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wider">{label}</p>
+              <p className="text-2xl font-bold text-gray-900 mt-2">{value}</p>
+              <p className="text-xs text-gray-500 mt-1">{subtext}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const renderRewardsSection = () => {
     // This would normally come from a database/API
@@ -1288,10 +1817,30 @@ export function AdminDashboard() {
 
           {activeSection === 'reports' && (
             <div className="ml-4 space-y-1 border-l-2 border-white/20 pl-4">
-              <button className="w-full text-left px-3 py-2 text-sm text-white/70 hover:text-white">
+              <button 
+                onClick={() => {
+                  setActiveSection('reports');
+                  setReportSubSection('netmargin');
+                }}
+                className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${
+                  reportSubSection === 'netmargin' 
+                    ? 'bg-white/10 text-white font-medium' 
+                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                }`}
+              >
                 Net Margin
               </button>
-              <button className="w-full text-left px-3 py-2 text-sm text-white/70 hover:text-white">
+              <button 
+                onClick={() => {
+                  setActiveSection('reports');
+                  setReportSubSection('salesbycategory');
+                }}
+                className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${
+                  reportSubSection === 'salesbycategory' 
+                    ? 'bg-white/10 text-white font-medium' 
+                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                }`}
+              >
                 Sales by Category
               </button>
             </div>
