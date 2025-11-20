@@ -67,7 +67,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
   const renderHome = () => (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center pb-8 border-b-2 border-gray-300 mb-8" style={{ marginTop: '-40px' }}>
+      <div className="text-center pb-8 border-b-2 border-gray-300 mb-8" style={{ marginTop: '10px' }}>
         <h1 className="text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">
           Welcome to Thread Trends
         </h1>
@@ -546,7 +546,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           alignItems: 'center',
           gap: '1rem',
           padding: '0.75rem 2rem',
-          backgroundColor: 'transparent',
+          backgroundColor: 'black',
           color: '#fff',
           borderRadius: '9999px',
           boxShadow: '0 10px 15px -3px rgba(18, 18, 18, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
@@ -555,18 +555,18 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           cursor: 'pointer'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.backgroundColor = 'black';
           e.currentTarget.style.transform = 'scale(1.05)';
           e.currentTarget.style.boxShadow = '0 30px 35px -5px rgba(68, 0, 255, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.backgroundColor = 'black';
           e.currentTarget.style.transform = 'scale(1)';
           e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(86, 104, 183, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
         }}
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-black" />
-        <span className="font-medium text-black">Back to Home</span>
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-white" />
+        <span className="font-medium text-white">Back to Home</span>
       </button>
 
       <div className="max-w-2xl mx-auto mt-16">
