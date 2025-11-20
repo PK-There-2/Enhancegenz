@@ -70,13 +70,13 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
       </div>
  {/* Main Header */}
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-2">
           {/* Logo */}
           <button 
             onClick={() => onNavigate('home')}
             className="flex-shrink-0 hover:opacity-60 transition-opacity"
           >
-            <h1 className="text-2xl tracking-tight">Thread Trends</h1>
+            <h1 className="text-xl sm:text-2xl tracking-tight whitespace-nowrap">Thread Trends</h1>
           </button>
 
           {/* Desktop Navigation */}
@@ -108,7 +108,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Search */}
             <div className="relative hidden sm:block" ref={searchMenuRef}>
               <button 
@@ -300,7 +300,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
             <div className="relative" ref={cartMenuRef}>
               <button 
                 onClick={() => setShowCart(!showCart)}
-                className="hover:opacity-60 transition-opacity relative"
+                className="hover:opacity-60 transition-opacity relative p-1"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {getCartCount() > 0 && (
@@ -336,10 +336,10 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
               )}
             </div>
             <button 
-              className="md:hidden hover:opacity-60 transition-opacity"
+              className="md:hidden hover:opacity-60 transition-opacity p-1"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
