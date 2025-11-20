@@ -90,7 +90,7 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           <div className="text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
             {userRewards?.totalPoints || 0}
           </div>
-          <div className="text-sm text-white/80 font-medium mb-4">Points</div>
+          <div className="text-sm text-white font-medium mb-4">Points</div>
           
           {/* Tier Badge */}
           <div className="mt-6">
@@ -236,30 +236,39 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         >
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
-        <h2 className="text-2xl font-bold text-gray-900">Ways to earn</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md p-2">
+            <Gift className="w-6 h-6 text-black" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">Ways to earn</h2>
+        </div>
       </div>
 
       <div className="space-y-4">
         {earnActions.map((action, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-5 bg-white rounded-xl border-2 border-gray-200 hover:border-pink-300 hover:shadow-md transition-all group"
+            className="flex items-center justify-between p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-black hover:shadow-2xl transition-all shadow-md hover:scale-[1.02]"
           >
             <div className="flex items-center gap-4">
-              <div className="text-4xl group-hover:scale-110 transition-transform">{action.icon}</div>
-              <span className="font-semibold text-gray-900">{action.action}</span>
+              <div className="text-4xl">{action.icon}</div>
+              <span className="font-bold text-gray-900 text-base">{action.action}</span>
             </div>
-            <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-sm">
+            <div className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-lg">
               +{action.points}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-purple-50 rounded-lg p-5 text-center border border-purple-100 mt-6">
-        <p className="text-purple-900 font-medium">
-          Join now for free to start earning
-        </p>
+      <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 text-center border-2 border-gray-200 shadow-md mt-6">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Sparkles className="w-5 h-5 text-black" />
+          <p className="text-gray-900 font-bold text-base">
+            Join now for free to start earning
+          </p>
+        </div>
+        <p className="text-sm text-gray-600">Complete actions to earn points and unlock rewards</p>
       </div>
     </div>
   );
@@ -273,13 +282,28 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
         >
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
-        <h2 className="text-2xl font-bold text-gray-900">Ways to redeem</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md p-2">
+            <Award className="w-6 h-6 text-black" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">Ways to redeem</h2>
+        </div>
       </div>
 
-      <div className="bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl p-6 text-center mb-8 shadow-lg">
-        <div className="text-sm text-white/90 mb-2 font-medium">Your Points Balance</div>
-        <div className="text-4xl font-extrabold text-white">{userRewards?.totalPoints || 0}</div>
-        <div className="text-sm text-white/80 mt-1">Available Points</div>
+      {/* Points Balance Card - Matching main page style */}
+      <div className="relative bg-black rounded-2xl p-8 text-center shadow-2xl overflow-hidden border-2 border-gray-700">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-600/20 via-transparent to-transparent"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-gray-700/30 to-transparent rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-gray-700/30 to-transparent rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Award className="w-6 h-6 text-white" />
+            <span className="text-sm font-semibold text-white/90 uppercase tracking-wide">Available to Redeem</span>
+          </div>
+          <div className="text-5xl font-extrabold text-white mb-2 drop-shadow-lg">{userRewards?.totalPoints || 0}</div>
+          <div className="text-sm text-white/80 font-medium">Points</div>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -289,9 +313,9 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
           return (
             <div
               key={reward.id}
-              className={`p-5 bg-white rounded-xl border-2 transition-all ${
+              className={`p-6 bg-white rounded-2xl border-2 transition-all shadow-md ${
                 canRedeem 
-                  ? 'border-green-300 hover:border-green-400 hover:shadow-lg' 
+                  ? 'border-green-300 hover:border-green-400 hover:shadow-2xl hover:scale-[1.02]' 
                   : 'border-gray-200 opacity-75'
               }`}
             >
@@ -299,23 +323,23 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
                 <div className="flex items-start gap-4 flex-1">
                   <div className="text-5xl">{reward.icon}</div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-lg mb-1">{reward.name}</h3>
-                    <p className="text-sm text-gray-600">{reward.description}</p>
+                    <h3 className="font-bold text-gray-900 text-lg mb-2">{reward.name}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{reward.description}</p>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
+              <div className="flex items-center justify-between pt-4 border-t-2 border-gray-100 mt-4">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-lg text-pink-600">{reward.points}</span>
-                  <span className="text-sm text-gray-500">Points</span>
+                  <span className="font-extrabold text-xl text-gray-900">{reward.points}</span>
+                  <span className="text-sm text-gray-500 font-medium">Points</span>
                 </div>
                 <button
                   onClick={() => handleRedeemReward(reward)}
                   disabled={!canRedeem}
-                  className={`px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm ${
+                  className={`px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${
                     canRedeem
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 hover:shadow-md transform hover:-translate-y-0.5'
+                      ? 'bg-black text-white hover:bg-gray-900 hover:shadow-2xl hover:scale-105 active:scale-95'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -325,6 +349,21 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
             </div>
           );
         })}
+      </div>
+
+      {/* Info Footer */}
+      <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 border-2 border-gray-200 shadow-md mt-6">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md p-2.5 border-2 border-gray-200">
+            <Gift className="w-7 h-7 text-black" />
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-1 text-base">Redeem your rewards</h4>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Use your points to unlock exclusive discounts and special offers. More rewards coming soon!
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -493,18 +532,44 @@ export function RewardsPage({ onBack }: RewardsPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 px-4 py-6 sm:py-8">
-      {/* Back to Home Button - Outside Main Container */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <button 
-          onClick={onBack} 
-          className="group inline-flex items-center gap-3 px-6 py-3.5 bg-white hover:bg-black hover:text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-black active:scale-95"
-        >
-          <ArrowLeft className="w-5 h-5 text-black group-hover:text-white transition-colors" />
-          <span className="text-base font-bold text-black group-hover:text-white transition-colors">Back to Home</span>
-        </button>
-      </div>
+      {/* Back to Home Button - Fixed */}
 
-      <div className="max-w-2xl mx-auto">
+      <button
+        onClick={onBack}
+        className="back-to-home-button"
+        style={{
+          position: 'fixed',
+          top: '2rem',
+          left: '2.5rem',
+          zIndex: '50',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '1rem',
+          padding: '0.75rem 2rem',
+          backgroundColor: '#000',
+          color: '#fff',
+          borderRadius: '9999px',
+          boxShadow: '0 10px 15px -3px rgba(18, 18, 18, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          transition: 'all 0.3s',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#1a1a1a';
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.boxShadow = '0 30px 35px -5px rgba(68, 0, 255, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#000';
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(86, 104, 183, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+        }}
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        <span className="font-medium">Back to Home</span>
+      </button>
+
+      <div className="max-w-2xl mx-auto mt-16">
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-900 overflow-hidden">
           {/* Header */}
