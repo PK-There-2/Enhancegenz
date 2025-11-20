@@ -225,7 +225,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                         >
-                          <UserCircle className="w-5 h-5" />
+                          <UserCircle className="w-4 h-4" />
                           <span>My Account</span>
                         </button>
                         <button 
@@ -236,7 +236,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           }}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                         >
-                          <Package className="w-5 h-5" />
+                          <Package className="w-4 h-4" />
                           <span>My Orders</span>
                         </button>
                         {user.role === 'admin' && (
@@ -247,7 +247,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                             }}
                             className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors text-left"
                           >
-                            <Shield className="w-5 h-5" />
+                            <Shield className="w-4 h-4" />
                             <span>Admin Dashboard</span>
                           </button>
                         )}
