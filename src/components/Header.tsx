@@ -5,8 +5,8 @@ import { useCart } from './CartContext.tsx';
 import { useWishlist } from './WishlistContext';
 
 interface HeaderProps {
-  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login';
-  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login') => void;
+  currentPage: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login' | 'rewards';
+  onNavigate: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login' | 'rewards') => void;
   onSearch?: (query: string) => void;
 }
 

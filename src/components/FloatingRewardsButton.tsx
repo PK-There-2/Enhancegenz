@@ -3,23 +3,35 @@ import { Gift } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { useRewards } from './RewardsContext';
 
-export function FloatingRewardsButton() {
+interface FloatingRewardsButtonProps {
+  onNavigate?: (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login' | 'rewards') => void;
+}
+
+export function FloatingRewardsButton({ onNavigate }: FloatingRewardsButtonProps = {}) {
   const { user } = useAuth();
-  const { userRewards, openRewardsWindow } = useRewards();
+  const { userRewards } = useRewards();
   const [isPulsing, setIsPulsing] = useState(true);
 
   // Only show for logged-in users
   if (!user) return null;
+
+  const handleClick = () => {
+    setIsPulsing(false);
+    // Navigate to rewards page
+    if (onNavigate) {
+      onNavigate('rewards');
+    } else {
+      // Fallback: dispatch navigation event
+      window.dispatchEvent(new CustomEvent('navigate', { detail: 'rewards' }));
+    }
+  };
 
   return (
     <>
       {/* Floating Rewards Button */}
       <div style={{ position: 'fixed', bottom: '32px', left: '32px', zIndex: 9999 }} className="flex items-end gap-4">
         <button
-          onClick={() => {
-            openRewardsWindow();
-            setIsPulsing(false);
-          }}
+          onClick={handleClick}
           className="relative flex items-center gap-3 px-8 py-4 bg-pink-500 text-white rounded-full shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group"
           style={{ 
             background: 'linear-gradient(135deg, #F5C6C6 0%, #F5C6C6 100%)',

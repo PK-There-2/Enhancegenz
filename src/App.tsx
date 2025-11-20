@@ -28,6 +28,7 @@ import { RefundPolicyFooter } from './components/RefundPolicyFooter';
 import { PrivacyPolicyFooter } from './components/PrivacyPolicyFooter';
 import { ContactPage } from './components/ContactPage';
 import { LoginPage } from './components/LoginPage';
+import { RewardsPage } from './components/RewardsPage';
 
 export default function App() {
   return (
@@ -44,7 +45,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login' | 'rewards'>('home');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetailData | null>(null);
   const [checkoutSource, setCheckoutSource] = useState<'cart' | 'buynow'>('cart');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -55,7 +56,7 @@ function AppContent() {
     const detail = event.detail;
     
     // Handle simple page navigation
-    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page', 'login'].includes(detail)) {
+    if (typeof detail === 'string' && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page', 'login', 'rewards'].includes(detail)) {
       navigateToPage(detail as any);
       return;
     }
@@ -64,7 +65,7 @@ function AppContent() {
     if (typeof detail === 'object' && detail !== null) {
       const { page, scrollTo, filter } = detail;
       
-      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page', 'login'].includes(page)) {
+      if (page && ['home', 'shop', 'about', 'contact', 'profile', 'admin', 'checkout', 'refund-policy', 'privacy-policy', 'refund-policy-footer', 'privacy-policy-footer', 'contact-page', 'login', 'rewards'].includes(page)) {
         navigateToPage(page as any);
         
         // Handle scroll to section
@@ -92,7 +93,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login') => {
+  const navigateToPage = (page: 'home' | 'shop' | 'about' | 'contact' | 'profile' | 'admin' | 'checkout' | 'refund-policy' | 'privacy-policy' | 'refund-policy-footer' | 'privacy-policy-footer' | 'contact-page' | 'login' | 'rewards') => {
     setSelectedProduct(null); // Clear selected product when navigating
     setCurrentPage(page);
     // Clear search query when navigating away from shop
@@ -142,6 +143,11 @@ function AppContent() {
     // Show login page
     if (currentPage === 'login') {
       return <LoginPage onBack={() => navigateToPage('home')} onSuccess={() => navigateToPage('home')} />;
+    }
+    
+    // Show rewards page
+    if (currentPage === 'rewards') {
+      return <RewardsPage onBack={() => navigateToPage('home')} />;
     }
     
     // Show checkout page
@@ -281,9 +287,9 @@ function AppContent() {
   };
   
 
-  const showFooter = !['admin', 'checkout'].includes(currentPage);
-  const showFloatingRewards = !['admin', 'checkout'].includes(currentPage);
-  const showHeader = !['checkout'].includes(currentPage);
+  const showFooter = !['admin', 'checkout', 'login', 'rewards'].includes(currentPage);
+  const showFloatingRewards = !['admin', 'checkout', 'login', 'rewards'].includes(currentPage);
+  const showHeader = !['checkout', 'login', 'rewards'].includes(currentPage);
 
   // Add event listener for navigation events
   useEffect(() => {
@@ -310,7 +316,7 @@ function AppContent() {
           onSearch={handleSearch}
         />
       )}
-      {showFloatingRewards && <FloatingRewardsButton />}
+      {showFloatingRewards && <FloatingRewardsButton onNavigate={navigateToPage} />}
       {renderPage()}
       {showFooter && <Footer />}
 
