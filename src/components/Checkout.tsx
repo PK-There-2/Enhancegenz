@@ -868,7 +868,12 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                     <p className="text-sm opacity-75 text-black">Valid for 24 hours only!</p>
                     
                     <button
-                      onClick={() => setShowPopup(false)}
+                      onClick={() => {
+                        setDiscountCode('SAVE20');
+                        setShowPopup(false);
+                        // Scroll to the discount input field
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       className="mt-4 w-full py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
                     >
                       Claim Offer
