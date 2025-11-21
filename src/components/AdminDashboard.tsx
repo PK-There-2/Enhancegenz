@@ -4,7 +4,7 @@ import {
   Edit2, Trash2, Save, Package, TrendingUp, Users, IndianRupee, X,
   Search, Loader2, AlertCircle, CheckCircle, LayoutDashboard, ShoppingCart,
   UserCircle, Megaphone, BarChart3, ChevronRight, ArrowUpRight, ArrowDownRight,
-  ShoppingBag, Gift, Award, Sparkles
+  ShoppingBag, Gift, Award, Sparkles, Ticket
 } from 'lucide-react';
 import { NotificationPanel } from './NotificationPanel.tsx';
 import { useRewards } from './RewardsContext.tsx';
@@ -83,10 +83,38 @@ export function AdminDashboard() {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'orders' | 'products' | 'customers' | 'marketing' | 'reports' | 'rewards'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'orders' | 'products' | 'customers' | 'marketing' | 'reports' | 'rewards' | 'coupons'>('dashboard');
   const [reportSubSection, setReportSubSection] = useState<'overview' | 'netmargin' | 'salesbycategory'>('overview');
   const [isAddingReward, setIsAddingReward] = useState(false);
   const { userRewards, openRewardsWindow } = useRewards();
+  // Removed unused state: const [showCouponTypeModal, setShowCouponTypeModal] = useState(false);
+  const [selectedCouponType, setSelectedCouponType] = useState<'collab' | 'festive' | 'cart' | null>(null);
+  const [coupons, setCoupons] = useState<any[]>([]);
+  
+  // Coupon form state
+  const [collabCouponData, setCollabCouponData] = useState({
+    name: '',
+    code: '',
+    discount: 0,
+    partner: '',
+    influencer: ''
+  });
+  
+  const [festiveCouponData, setFestiveCouponData] = useState({
+    name: '',
+    code: '',
+    discount: 0,
+    festival: 'Diwali',
+    minOrderValue: 0
+  });
+  
+  const [cartCouponData, setCartCouponData] = useState({
+    name: '',
+    code: '',
+    discount: 0,
+    minItems: 2,
+    minCartValue: 0
+  });
 
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
@@ -267,6 +295,73 @@ export function AdminDashboard() {
       icon: '🎁',
       available: true
     });
+  };
+
+  // Function to handle coupon creation flow - not used since we select type directly
+  const handleCreateCoupon = () => {
+    // Not implemented since we select type directly from cards
+  };
+
+  // Function to select coupon type and proceed
+  const selectCouponType = (type: 'collab' | 'festive' | 'cart') => {
+    setSelectedCouponType(type);
+  };
+
+  // Function to save coupon
+  const saveCoupon = (couponData: any) => {
+    const newCoupon = {
+      ...couponData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      type: selectedCouponType
+    };
+    
+    setCoupons([...coupons, newCoupon]);
+    setSelectedCouponType(null);
+    showNotification('success', 'Coupon created successfully!');
+  };
+
+  // Reset form data when canceling
+  const resetCouponForms = () => {
+    setCollabCouponData({
+      name: '',
+      code: '',
+      discount: 0,
+      partner: '',
+      influencer: ''
+    });
+    setFestiveCouponData({
+      name: '',
+      code: '',
+      discount: 0,
+      festival: 'Diwali',
+      minOrderValue: 0
+    });
+    setCartCouponData({
+      name: '',
+      code: '',
+      discount: 0,
+      minItems: 2,
+      minCartValue: 0
+    });
+  };
+
+  // Function to cancel coupon creation
+  const cancelCouponCreation = () => {
+    setSelectedCouponType(null);
+    resetCouponForms();
+  };
+
+  // Function to group coupons by type
+  const groupCouponsByType = () => {
+    return coupons.reduce((groups, coupon) => {
+      const type = coupon.type;
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(coupon);
+      return groups;
+    }, {} as Record<string, any[]>);
   };
 
   const filteredProducts = products.filter(p => 
@@ -1160,6 +1255,549 @@ export function AdminDashboard() {
     );
   };
 
+  const renderCouponsSection = () => {
+    // Group coupons by type for display
+    const groupedCoupons = groupCouponsByType();
+    
+    // Handle form submissions
+    const handleCollabCouponSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      saveCoupon({
+        ...collabCouponData,
+        type: 'collab'
+      });
+      setCollabCouponData({
+        name: '',
+        code: '',
+        discount: 0,
+        partner: '',
+        influencer: ''
+      });
+    };
+    
+    const handleFestiveCouponSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      saveCoupon({
+        ...festiveCouponData,
+        type: 'festive'
+      });
+      setFestiveCouponData({
+        name: '',
+        code: '',
+        discount: 0,
+        festival: 'Diwali',
+        minOrderValue: 0
+      });
+    };
+    
+    const handleCartCouponSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      saveCoupon({
+        ...cartCouponData,
+        type: 'cart'
+      });
+      setCartCouponData({
+        name: '',
+        code: '',
+        discount: 0,
+        minItems: 2,
+        minCartValue: 0
+      });
+    };
+    
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Ticket className="w-8 h-8 text-blue-600" />
+            Coupons Management
+          </h2>
+          <p className="text-sm text-gray-500 mt-2">Create and manage discount coupons for your customers</p>
+        </div>
+
+        {/* Coupon Creation Forms */}
+        {selectedCouponType === 'collab' && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Create Collaboration Coupon</h3>
+              <button 
+                onClick={cancelCouponCreation}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCollabCouponSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Name *</label>
+                <input
+                  type="text"
+                  value={collabCouponData.name}
+                  onChange={(e) => setCollabCouponData({...collabCouponData, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., Influencer Special"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Code *</label>
+                <input
+                  type="text"
+                  value={collabCouponData.code}
+                  onChange={(e) => setCollabCouponData({...collabCouponData, code: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., INFLUENCER10"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage *</label>
+                <input
+                  type="number"
+                  value={collabCouponData.discount}
+                  onChange={(e) => setCollabCouponData({...collabCouponData, discount: parseInt(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  min="1"
+                  max="99"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Partner Name</label>
+                  <input
+                    type="text"
+                    value={collabCouponData.partner}
+                    onChange={(e) => setCollabCouponData({...collabCouponData, partner: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                    placeholder="e.g., Brand Name"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Influencer Name</label>
+                  <input
+                    type="text"
+                    value={collabCouponData.influencer}
+                    onChange={(e) => setCollabCouponData({...collabCouponData, influencer: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                    placeholder="e.g., Influencer Name"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Create Coupon
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelCouponCreation}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+        
+        {selectedCouponType === 'festive' && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Create Festival Coupon</h3>
+              <button 
+                onClick={cancelCouponCreation}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleFestiveCouponSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Name *</label>
+                <input
+                  type="text"
+                  value={festiveCouponData.name}
+                  onChange={(e) => setFestiveCouponData({...festiveCouponData, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., Diwali Special"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Code *</label>
+                <input
+                  type="text"
+                  value={festiveCouponData.code}
+                  onChange={(e) => setFestiveCouponData({...festiveCouponData, code: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., DIWALI20"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage *</label>
+                <input
+                  type="number"
+                  value={festiveCouponData.discount}
+                  onChange={(e) => setFestiveCouponData({...festiveCouponData, discount: parseInt(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  min="1"
+                  max="99"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Festival *</label>
+                  <select
+                    value={festiveCouponData.festival}
+                    onChange={(e) => setFestiveCouponData({...festiveCouponData, festival: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  >
+                    <option value="Diwali">Diwali</option>
+                    <option value="Christmas">Christmas</option>
+                    <option value="New Year">New Year</option>
+                    <option value="Holi">Holi</option>
+                    <option value="Eid">Eid</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Order Value (₹)</label>
+                  <input
+                    type="number"
+                    value={festiveCouponData.minOrderValue}
+                    onChange={(e) => setFestiveCouponData({...festiveCouponData, minOrderValue: parseInt(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                    min="0"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Create Coupon
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelCouponCreation}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+        
+        {selectedCouponType === 'cart' && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Create Cart-based Coupon</h3>
+              <button 
+                onClick={cancelCouponCreation}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCartCouponSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Name *</label>
+                <input
+                  type="text"
+                  value={cartCouponData.name}
+                  onChange={(e) => setCartCouponData({...cartCouponData, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., Bulk Order Discount"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Code *</label>
+                <input
+                  type="text"
+                  value={cartCouponData.code}
+                  onChange={(e) => setCartCouponData({...cartCouponData, code: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  placeholder="e.g., BULK15"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage *</label>
+                <input
+                  type="number"
+                  value={cartCouponData.discount}
+                  onChange={(e) => setCartCouponData({...cartCouponData, discount: parseInt(e.target.value) || 0})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                  min="1"
+                  max="99"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Items in Cart *</label>
+                  <input
+                    type="number"
+                    value={cartCouponData.minItems}
+                    onChange={(e) => setCartCouponData({...cartCouponData, minItems: parseInt(e.target.value) || 2})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                    min="2"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Cart Value (₹)</label>
+                  <input
+                    type="number"
+                    value={cartCouponData.minCartValue}
+                    onChange={(e) => setCartCouponData({...cartCouponData, minCartValue: parseInt(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-black focus:outline-none"
+                    min="0"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Create Coupon
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelCouponCreation}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+        
+        {/* Coupon Type Cards (only shown when not creating a coupon) */}
+        {!selectedCouponType && (
+          <>
+            {/* <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  <Ticket className="w-8 h-8 text-blue-600" />
+                  Coupons Management
+                </h2>
+                <p className="text-sm text-gray-500 mt-2">Create and manage discount coupons for your customers</p>
+              </div>
+            </div> */}
+            
+            
+                 
+                <div className="flex flex-wrap gap-2" style = {{marginTop : '-4rem'}}>
+                  <button 
+                    onClick={() => selectCouponType('collab')}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                  >
+                    <span>Collaboration</span>
+                  </button>
+                  <button 
+                    onClick={() => selectCouponType('festive')}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+                  >
+                    <span>Festival</span>
+                  </button>
+                  <button 
+                    onClick={() => selectCouponType('cart')}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2"
+                  >
+                    <span>Cart-based</span>
+                  </button>
+                </div>
+             
+         
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+              {/* Collaboration Codes Card */}
+              <div 
+                className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 shadow-sm border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all duration-300 group cursor-pointer"
+                onClick={() => selectCouponType('collab')}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold opacity-100 transition-opacity">
+                    +
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Collaboration Codes</h3>
+                <p className="text-gray-600 text-sm mb-4" style={{ zIndex : '10' }}>Create special codes for brand partnerships and influencer collaborations</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Partnerships</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Influencers</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Brands</span>
+                </div>
+                <div className="mt-4 pt-4 border-t border-blue-100 flex items-center justify-between">
+                  <span className="text-sm text-blue-600 font-medium">Create New</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Festival Season Codes Card */}
+              <div 
+                className="bg-gradient-to-br from-green-50 to-white rounded-2xl p-6 shadow-sm border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all duration-300 group cursor-pointer"
+                onClick={() => selectCouponType('festive')}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-lg font-bold opacity-100 transition-opacity">
+                    +
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Festival Season Codes</h3>
+                <p className="text-gray-600 text-sm mb-4">Seasonal discount codes for Diwali, Christmas, New Year, and other festivals</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Diwali</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Christmas</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">New Year</span>
+                </div>
+                <div className="mt-4 pt-4 border-t border-green-100 flex items-center justify-between">
+                  <span className="text-sm text-green-600 font-medium">Create New</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Cart-based Codes Card */}
+              <div 
+                className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 shadow-sm border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all duration-300 group cursor-pointer"
+                onClick={() => selectCouponType('cart')}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center text-lg font-bold opacity-100 transition-opacity">
+                    +
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Cart-based Codes</h3>
+                <p className="text-gray-600 text-sm mb-4">Discount codes for customers with multiple items in their cart</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Multi-item</span>
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Bulk Orders</span>
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Value Deals</span>
+                </div>
+                <div className="mt-4 pt-4 border-t border-purple-100 flex items-center justify-between">
+                  <span className="text-sm text-purple-600 font-medium">Create New</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Coupon Statistics */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-4xl">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Coupon Statistics</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="text-sm font-semibold text-gray-900 mb-1">Total Coupons</div>
+                  <div className="text-2xl font-bold text-gray-900">{coupons.length}</div>
+                  <div className="text-xs text-gray-500 mt-1">Created so far</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="text-sm font-semibold text-gray-900 mb-1">Active Coupons</div>
+                  <div className="text-2xl font-bold text-gray-900">{coupons.length}</div>
+                  <div className="text-xs text-gray-500 mt-1">Currently valid</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="text-sm font-semibold text-gray-900 mb-1">Redeemed</div>
+                  <div className="text-2xl font-bold text-gray-900">0</div>
+                  <div className="text-xs text-gray-500 mt-1">Times used</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section-wise Coupons Display */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-4xl">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Section-wise Coupons</h3>
+              
+              {coupons.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Ticket className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>No coupons created yet</p>
+                  <p className="text-sm mt-1">Create coupons to see them organized by section</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {Object.entries(groupedCoupons).map(([type, typeCoupons]) => (
+                    <div key={type} className="border border-gray-200 rounded-lg p-4">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3 capitalize">
+                        {type === 'collab' ? 'Collaboration Codes' : 
+                         type === 'festive' ? 'Festival Season Codes' : 
+                         'Cart-based Codes'}
+                        <span className="text-sm font-normal text-gray-500 ml-2">({(typeCoupons as any[]).length})</span>
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {(typeCoupons as any[]).map((coupon: any) => (
+                          <div key={coupon.id} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h5 className="font-medium text-gray-900">{coupon.name}</h5>
+                                <p className="text-sm text-gray-600 mt-1">{coupon.code}</p>
+                              </div>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {coupon.discount}% off
+                              </span>
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500">
+                              Created: {new Date(coupon.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
   const renderRewardsSection = () => {
     // This would normally come from a database/API
     const rewards = [
@@ -1797,6 +2435,7 @@ export function AdminDashboard() {
             { id: 'marketing', icon: Megaphone, label: 'Marketing', hasChevron: true },
             { id: 'reports', icon: BarChart3, label: 'Reports', hasChevron: true },
             { id: 'rewards', icon: Gift, label: 'Rewards' },
+            { id: 'coupons', icon: Ticket, label: 'Coupons' },
           ].map((item) => (
             <button
               key={item.id}
@@ -1882,6 +2521,7 @@ export function AdminDashboard() {
           {activeSection === 'marketing' && renderMarketingSection()}
           {activeSection === 'reports' && renderReportsSection()}
           {activeSection === 'rewards' && renderRewardsSection()}
+          {activeSection === 'coupons' && renderCouponsSection()}
         </div>
       </div>
     </div>
