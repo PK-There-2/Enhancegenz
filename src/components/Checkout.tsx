@@ -30,6 +30,11 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
     return stored ? JSON.parse(stored) : { items: [], total: 0 };
   });
 
+  // Add discount state
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
+
   const [formData, setFormData] = useState({
     email: user?.email || '',
     firstName: user?.name?.split(' ')[0] || '',
@@ -65,6 +70,25 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
       return () => clearTimeout(timer);
     }
   }, [step]);
+
+  // Function to apply discount
+  const applyDiscount = () => {
+    if (discountCode.toUpperCase() === 'SAVE20') {
+      const discount = Math.round(orderData.total * 0.20);
+      setDiscountAmount(discount);
+      setDiscountApplied(true);
+    } else {
+      alert('Invalid discount code');
+    }
+  };
+
+  // Function to calculate final total
+  const calculateTotal = () => {
+    const subtotal = orderData.total;
+    const shippingCost = shippingMethod === 'free' ? 0 : 99;
+    const tax = Math.round((subtotal - discountAmount) * 0.18);
+    return subtotal - discountAmount + shippingCost;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -132,7 +156,8 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
       shippingMethod,
       paymentMethod,
       items: orderData.items,
-      total: orderData.total
+      total: calculateTotal(), // Use the final total with discount
+      discount: discountApplied ? discountAmount : 0
     };
 
     const orders = JSON.parse(localStorage.getItem('thread_trends_orders') || '[]');
@@ -140,14 +165,14 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
     localStorage.setItem('thread_trends_orders', JSON.stringify(orders));
 
     window.dispatchEvent(new CustomEvent('orders-updated'));
-    earnPoints('Place an order', 200, `Order #${newOrderNumber} - ₹${orderData.total.toLocaleString()}`);
+    earnPoints('Place an order', 200, `Order #${newOrderNumber} - ₹${order.total.toLocaleString()}`);
     localStorage.removeItem('thread_trends_checkout_data');
 
     setStep('confirmation');
   };
 
   const calculateTax = () => {
-    return Math.round(orderData.total * 0.18);
+    return Math.round((orderData.total - discountAmount) * 0.18);
   };
 
   if (step === 'confirmation') {
@@ -190,7 +215,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment method</h3>
               <p className="text-gray-600">
-                {paymentMethod === 'cod' ? 'Cash on Delivery' : `UPI Payment (${UPI_ID})`} · ₹{orderData.total.toLocaleString()} INR
+                {paymentMethod === 'cod' ? 'Cash on Delivery' : `UPI Payment (${UPI_ID})`} · ₹{calculateTotal().toLocaleString()} INR
               </p>
             </div>
 
@@ -738,14 +763,26 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                   ))}
                 </div>
 
+                {/* Discount Input */}
                 <div className="flex gap-3 mb-6">
                   <input
                     type="text"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
                     placeholder="Discount code"
                     className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    disabled={discountApplied}
                   />
-                  <button className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                    Apply
+                  <button 
+                    onClick={applyDiscount}
+                    className={`px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
+                      discountApplied 
+                        ? 'bg-gray-100 text-green-700 cursor-default' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-black hover:text-white hover:shadow-md hover:-translate-y-0.5'
+                    }`}
+                    disabled={discountApplied}
+                  >
+                    {discountApplied ? 'Applied' : 'Apply'}
                   </button>
                 </div>
 
@@ -754,6 +791,15 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-medium text-gray-900">₹{orderData.total.toLocaleString()}</span>
                   </div>
+                  
+                  {/* Show discount if applied */}
+                  {discountApplied && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Discount (SAVE20)</span>
+                      <span className="font-medium text-green-600">-₹{discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Shipping</span>
                     <span className="font-medium text-gray-900">
@@ -767,7 +813,7 @@ export function Checkout({ onComplete, onCancel }: CheckoutProps) {
                   <div className="flex justify-between text-lg font-bold pt-4">
                     <span className="text-gray-900">Total</span>
                     <span className="text-gray-900">
-                      ₹{(orderData.total + (shippingMethod === 'free' ? 0 : 99)).toLocaleString()}
+                      ₹{calculateTotal().toLocaleString()}
                     </span>
                   </div>
                 </div>
