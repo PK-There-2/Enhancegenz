@@ -1731,17 +1731,17 @@ export function AdminDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 max-w-4xl">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Coupon Statistics</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="text-sm font-semibold text-gray-900 mb-1">Total Coupons</div>
                   <div className="text-2xl font-bold text-gray-900">{coupons.length}</div>
                   <div className="text-xs text-gray-500 mt-1">Created so far</div>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="text-sm font-semibold text-gray-900 mb-1">Active Coupons</div>
                   <div className="text-2xl font-bold text-gray-900">{coupons.length}</div>
                   <div className="text-xs text-gray-500 mt-1">Currently valid</div>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="text-sm font-semibold text-gray-900 mb-1">Redeemed</div>
                   <div className="text-2xl font-bold text-gray-900">0</div>
                   <div className="text-xs text-gray-500 mt-1">Times used</div>
