@@ -464,7 +464,7 @@ export function Header({ currentPage, onNavigate, onSearch }: HeaderProps) {
                           onNavigate('admin');
                           setIsMenuOpen(false);
                         }}
-                        className="w-full py-3 bg-blue-600 border border-black hover:bg-gray-50"
+                        className="w-full py-3 bg-blue-600 border border-black hover:bg-gray-50 text-black"
                       >
                         Admin Dashboard
                       </button>
