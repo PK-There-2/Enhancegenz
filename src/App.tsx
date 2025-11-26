@@ -13,6 +13,7 @@ import { ShopByChoice } from './components/ShopByChoice';
 import { CollectionsGrid } from './components/CollectionsGrid';
 import { NewsletterCTA } from './components/NewsletterCTA';
 import { FeaturesSection } from './components/FeaturesSection';
+import { WinterCollection } from './components/WinterCollection';
 import { Footer } from './components/Footer';
 import { Shop } from './components/Shop';
 import { About } from './components/About';
@@ -263,6 +264,7 @@ function AppContent() {
             <ShopByChoice onNavigateShop={navigateToShop} />
             <CollectionsGrid onNavigateShop={navigateToShop} />
             <FeaturesSection />
+            <WinterCollection onNavigateShop={navigateToShop} />
             <NewsletterCTA />
           </>
         );

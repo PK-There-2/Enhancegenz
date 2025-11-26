@@ -2,80 +2,62 @@ import { ProductCard } from './ProductCard';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
-const bestSellerProducts = [
+const winterProducts = [
   {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Passion & Purpose Tee',
-    price: 1299,
-    originalPrice: 1899,
+    id: 101,
+    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBob29kaWV8ZW58MXx8fHwxNzYxOTg2MjY1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Arctic Warmth Hoodie',
+    price: 2999,
+    originalPrice: 3999,
     isSale: true,
-    category: 'Graphic Tees'
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1711387718409-a05f62a3dc39?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob29kaWUlMjBzdHJlZXR3ZWFyfGVufDF8fHx8MTc2MTk3NjI0N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Urban Hoodie Black',
-    price: 2499,
     category: 'Hoodies'
   },
   {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1504198458649-3128b932f49e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxOTAyMjgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Lost in Space Oversized Tee',
-    price: 1299,
-    originalPrice: 1999,
-    isSale: true,
-    category: 'Oversized'
-  },
-  {
-    id: 4,
-    image: 'https://images.unsplash.com/photo-1715865871494-6bba579c2dc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGplYW5zJTIwZmFzaGlvbnxlbnwxfHx8fDE3NjE5NTQxMzl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Vintage Denim Jeans',
-    price: 2999,
+    id: 102,
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBqb2dnZXJzfGVufDF8fHx8MTc2MTk4NjI2NXww&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Winter Essentials Joggers',
+    price: 1999,
     category: 'Bottoms'
   },
   {
-    id: 5,
-    image: 'https://images.unsplash.com/photo-1715865871494-6bba579c2dc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZW5pbSUyMGplYW5zJTIwZmFzaGlvbnxlbnwxfHx8fDE3NjE5NTQxMzl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Vintage Denim Jeans',
-    price: 599,
-    category: 'Bottoms'
+    id: 103,
+    image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBjb2F0fGVufDF8fHx8MTc2MTk4NjI2NXww&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Insulated Winter Coat',
+    price: 4999,
+    originalPrice: 6999,
+    isSale: true,
+    category: 'Jackets'
   },
   {
-    id: 6,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Passion & Purpose Tee',
-    price: 1299,
-    originalPrice: 1899,
-    isSale: true,
-    category: 'Graphic Tees'
+    id: 104,
+    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBzd2VhdGVyfGVufDF8fHx8MTc2MTk4NjI2NXww&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Thermal Sweater Set',
+    price: 2499,
+    category: 'Sweaters'
   },
   {
-    id: 7,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Passion & Purpose Tee',
-    price: 1299,
-    originalPrice: 1899,
-    isSale: true,
-    category: 'Graphic Tees'
+    id: 105,
+    image: 'https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBiZWFuaWV8ZW58MXx8fHwxNzYxOTg2MjY1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Beanie Winter Cap',
+    price: 799,
+    category: 'Accessories'
   },
   {
-    id: 8,
-    image: 'https://images.unsplash.com/photo-1613372281199-ec69ace5e926?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwdXJiYW58ZW58MXx8fHwxNzYxOTc3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-    name: 'Passion & Purpose Tee',
-    price: 1299,
-    originalPrice: 1899,
+    id: 106,
+    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aW50ZXIlMjBzaG9lc3xlbnwxfHx8fDE3NjE5ODYyNjV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    name: 'Snowproof Boots',
+    price: 3999,
+    originalPrice: 5999,
     isSale: true,
-    category: 'Graphic Tees'
-  },
+    category: 'Footwear'
+  }
 ];
 
-interface BestSellersProps {
+interface WinterCollectionProps {
   onNavigateShop: () => void;
 }
 
-export function BestSellers({ onNavigateShop }: BestSellersProps) {
+export function WinterCollection({ onNavigateShop }: WinterCollectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -95,9 +77,9 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
   
   // Create extended array with clones for infinite loop
   const extendedProducts = [
-    ...bestSellerProducts,
-    ...bestSellerProducts,
-    ...bestSellerProducts
+    ...winterProducts,
+    ...winterProducts,
+    ...winterProducts
   ];
 
   // Update items per view on window resize
@@ -112,7 +94,7 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
 
   // Set initial position to middle set
   useEffect(() => {
-    setCurrentIndex(bestSellerProducts.length);
+    setCurrentIndex(winterProducts.length);
   }, [itemsPerView]);
 
   // Handle infinite loop - check position after transition
@@ -122,9 +104,9 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
 
     const handleTransitionEnd = () => {
       // If we're at or past the end of the second set, jump to first set
-      if (currentIndex >= bestSellerProducts.length * 2) {
+      if (currentIndex >= winterProducts.length * 2) {
         carousel.style.transition = 'none';
-        setCurrentIndex(bestSellerProducts.length);
+        setCurrentIndex(winterProducts.length);
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             carousel.style.transition = 'transform 500ms ease-out';
@@ -132,9 +114,9 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
         });
       }
       // If we're before the first set, jump to second set
-      else if (currentIndex < bestSellerProducts.length) {
+      else if (currentIndex < winterProducts.length) {
         carousel.style.transition = 'none';
-        setCurrentIndex(bestSellerProducts.length * 2 - 1);
+        setCurrentIndex(winterProducts.length * 2 - 1);
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             carousel.style.transition = 'transform 500ms ease-out';
@@ -172,19 +154,25 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
     setCurrentIndex((prev) => prev + 1);
   };
 
+  // Add a placeholder function for product clicks
+  const handleProductClick = () => {
+    // For now, we'll just navigate to the shop when a product is clicked
+    onNavigateShop();
+  };
+
   return (
-    <section id="best-sellers" className="py-16 sm:py-20 bg-white overflow-hidden">
+    <section id="winter-collection" className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-10 sm:mb-12 text-center">
           <div className="inline-block mb-4">
             <span className="text-sm font-extrabold text-black tracking-widest uppercase">
-              Best Sellers
+              Winter Collection
             </span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 relative">Most Loved Pieces</h2>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl mb-4 sm:mb-6 relative">Stay Warm, Stay Stylish</h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
-            Our community's favorites. These pieces sell out fast
+            Our premium winter essentials to keep you cozy all season long
           </p>
         </div>
 
@@ -210,7 +198,7 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
                 style={{ width: `${100 / itemsPerView}%` }}
               >
                 <div className="h-full">
-                  <ProductCard {...product} id={product.id} onClick={onNavigateShop} />
+                  <ProductCard {...product} id={product.id} onClick={handleProductClick} />
                 </div>
               </div>
             ))}
@@ -247,7 +235,7 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
             onClick={onNavigateShop}
             className="group inline-flex items-center gap-1 px-8 py-3 bg-black text-white hover:bg-gray-900 hover:scale-105 hover:shadow-xl transition-all duration-300 rounded-md"
           >
-            <span>Shop All Products</span>
+            <span>Shop Winter Collection</span>
             <ArrowRight className="w-2 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

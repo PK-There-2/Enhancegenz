@@ -37,6 +37,11 @@ export function Footer() {
                 const event = new CustomEvent('navigate', { detail: { page: 'shop', filter: 'hoodies' } });
                 window.dispatchEvent(event);
               }} className="hover:text-white transition-colors cursor-pointer">Hoodies</a></li>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                const event = new CustomEvent('navigate', { detail: { page: 'home', scrollTo: 'winter-collection' } });
+                window.dispatchEvent(event);
+              }} className="hover:text-white transition-colors cursor-pointer">Winter Collection</a></li>
             </ul>
           </div>
 

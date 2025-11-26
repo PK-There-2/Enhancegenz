@@ -70,17 +70,21 @@ export function ProductCard({ id, image, name, price, originalPrice, isSale, cat
       </div>
 
       {/* Info */}
-      <div className="px-4 py-3 space-y-1.5 mt-auto min-h-[140px] flex flex-col">
+      <div className="px-4 py-3 space-y-1.5 flex flex-col flex-grow">
         <p className="text-[10px] text-gray-500 uppercase tracking-widest">
           {category}
         </p>
         <h3
-          className="text-sm sm:text-base font-semibold text-gray-900 leading-snug min-h-[3.2rem] overflow-hidden"
-          style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+          className="text-sm sm:text-base font-semibold text-gray-900 leading-snug overflow-hidden flex-grow"
+          style={{ 
+            display: '-webkit-box', 
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical' 
+          }}
         >
           {name}
         </h3>
-        <div className="flex items-baseline gap-2 pt-0.5 min-h-[28px] mt-auto">
+        <div className="flex items-baseline gap-2 pt-0.5">
           <span className="text-base sm:text-lg font-bold text-gray-900">
             ₹{price.toLocaleString()}
           </span>
@@ -89,9 +93,6 @@ export function ProductCard({ id, image, name, price, originalPrice, isSale, cat
               <span className="text-xs text-gray-400 line-through">
                 ₹{originalPrice.toLocaleString()}
               </span>
-              {/* <span className="ml-1 inline-flex items-center justify-center text-[10px] leading-none px-1.5 py-[2px] rounded-full whitespace-nowrap bg-black text-white">
-                {Math.max(0, Math.round(((originalPrice - price) / originalPrice) * 100))}% off
-              </span> */}
             </>
           )}
         </div>
