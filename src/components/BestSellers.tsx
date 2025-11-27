@@ -76,19 +76,18 @@ interface BestSellersProps {
 }
 
 export function BestSellers({ onNavigateShop }: BestSellersProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const isScrollingRef = useRef(false);
 
-  // Number of items to show per view based on screen size
+  // Number of items to show per view based on screen size (increased for smaller cards)
   const getItemsPerView = () => {
     if (typeof window === 'undefined') return 4;
-    if (window.innerWidth < 640) return 1; // mobile
-    if (window.innerWidth < 768) return 2; // tablet
-    if (window.innerWidth < 1024) return 3; // small desktop
-    return 4; // large desktop
+    if (window.innerWidth < 640) return 2.5; // mobile - show 2.5 cards
+    if (window.innerWidth < 768) return 3.5; // tablet - show 3.5 cards
+    if (window.innerWidth < 1024) return 4.5; // small desktop - show 4.5 cards
+    return 6.0; // large desktop - show 5.5 cards
   };
 
   const [itemsPerView, setItemsPerView] = useState(getItemsPerView());
@@ -110,67 +109,50 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Set initial position to middle set
+  // Handle infinite scroll loop with smooth repositioning
   useEffect(() => {
-    setCurrentIndex(bestSellerProducts.length);
-  }, [itemsPerView]);
+    const container = carouselRef.current;
+    if (!container) return;
 
-  // Handle infinite loop - check position after transition
-  useEffect(() => {
-    const carousel = carouselRef.current?.querySelector('.carousel-track') as HTMLElement;
-    if (!carousel) return;
-
-    const handleTransitionEnd = () => {
-      // If we're at or past the end of the second set, jump to first set
-      if (currentIndex >= bestSellerProducts.length * 2) {
-        carousel.style.transition = 'none';
-        setCurrentIndex(bestSellerProducts.length);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            carousel.style.transition = 'transform 500ms ease-out';
-          });
-        });
+    const handleScroll = () => {
+      if (isScrollingRef.current) return;
+      
+      const scrollLeft = container.scrollLeft;
+      const singleSetWidth = container.scrollWidth / 3; // Since we have 3 sets of products
+      
+      // If scrolled past the end of the second set, jump to first set
+      if (scrollLeft >= singleSetWidth * 2 - 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth;
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
       }
-      // If we're before the first set, jump to second set
-      else if (currentIndex < bestSellerProducts.length) {
-        carousel.style.transition = 'none';
-        setCurrentIndex(bestSellerProducts.length * 2 - 1);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            carousel.style.transition = 'transform 500ms ease-out';
-          });
-        });
+      // If scrolled before the first set, jump to second set
+      else if (scrollLeft <= 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth * 2 - (container.scrollWidth / 3);
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
       }
     };
 
-    carousel.addEventListener('transitionend', handleTransitionEnd);
-    return () => carousel.removeEventListener('transitionend', handleTransitionEnd);
-  }, [currentIndex]);
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Auto-play functionality
+  // Auto-scroll to middle set on mount to enable infinite scroll in both directions
   useEffect(() => {
-    if (isAutoPlaying) {
-      autoPlayRef.current = setInterval(() => {
-        setCurrentIndex((prev) => prev + 1);
-      }, 4000);
+    if (carouselRef.current) {
+      const singleSetWidth = carouselRef.current.scrollWidth / 3;
+      carouselRef.current.scrollLeft = singleSetWidth;
     }
-
-    return () => {
-      if (autoPlayRef.current) {
-        clearInterval(autoPlayRef.current);
-      }
-    };
-  }, [isAutoPlaying]);
-
-  const handlePrevious = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => prev + 1);
-  };
+  }, []);
 
   return (
     <section id="best-sellers" className="py-16 sm:py-20 bg-white overflow-hidden">
@@ -187,60 +169,39 @@ export function BestSellers({ onNavigateShop }: BestSellersProps) {
             Our community's favorites. These pieces sell out fast
           </p>
         </div>
+      </div>
 
-        {/* Carousel Track */}
-        <div 
-          className="flex-1 overflow-x-auto scrollbar-hide mb-6" 
-          ref={carouselRef}
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          <div
-            className="carousel-track flex transition-transform duration-500 ease-out"
-            style={{
-              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`
-            }}
-          >
-            {extendedProducts.map((product, index) => (
-              <div
-                key={`${product.id}-${index}`}
-                className="flex-shrink-0 px-2 sm:px-3 md:px-4"
-                style={{ width: `${100 / itemsPerView}%` }}
-              >
-                <div className="h-full">
-                  <ProductCard {...product} id={product.id} onClick={onNavigateShop} />
-                </div>
+      {/* Carousel Track - Full Width */}
+      <div 
+        className="overflow-x-auto scrollbar-hide mb-6 scroll-smooth w-full"
+        ref={carouselRef}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        <div className="flex w-max">
+          {extendedProducts.map((product, index) => (
+            <div
+              key={`${product.id}-${index}`}
+              className="flex-shrink-0 px-2 sm:px-3 md:px-4"
+              style={{ width: `${100 / itemsPerView}%` }}
+            >
+              <div className="h-full">
+                <ProductCard {...product} id={product.id} onClick={onNavigateShop} />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
 
-        {/* Navigation Arrows */}
-        <div className="flex justify-center gap-4 mb-10">
-          <button
-            onClick={handlePrevious}
-            className="flex-shrink-0 w-12 h-12 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors rounded-full"
-            aria-label="Previous products"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={handleNext}
-            className="flex-shrink-0 w-12 h-12 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors rounded-full"
-            aria-label="Next products"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{padding : '2rem'}}>
         {/* CTA Button */}
         <div className="text-center mb-10 sm:mb-14">
           <button

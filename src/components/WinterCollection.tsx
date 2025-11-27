@@ -58,8 +58,7 @@ interface WinterCollectionProps {
 }
 
 export function WinterCollection({ onNavigateShop }: WinterCollectionProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const isScrollingRef = useRef(false);
@@ -70,7 +69,7 @@ export function WinterCollection({ onNavigateShop }: WinterCollectionProps) {
     if (window.innerWidth < 640) return 1; // mobile
     if (window.innerWidth < 768) return 2; // tablet
     if (window.innerWidth < 1024) return 3; // small desktop
-    return 4; // large desktop
+    return 6.0; // large desktop
   };
 
   const [itemsPerView, setItemsPerView] = useState(getItemsPerView());
@@ -92,67 +91,50 @@ export function WinterCollection({ onNavigateShop }: WinterCollectionProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Set initial position to middle set
+  // Handle infinite scroll loop with smooth repositioning
   useEffect(() => {
-    setCurrentIndex(winterProducts.length);
-  }, [itemsPerView]);
+    const container = carouselRef.current;
+    if (!container) return;
 
-  // Handle infinite loop - check position after transition
-  useEffect(() => {
-    const carousel = carouselRef.current?.querySelector('.carousel-track') as HTMLElement;
-    if (!carousel) return;
-
-    const handleTransitionEnd = () => {
-      // If we're at or past the end of the second set, jump to first set
-      if (currentIndex >= winterProducts.length * 2) {
-        carousel.style.transition = 'none';
-        setCurrentIndex(winterProducts.length);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            carousel.style.transition = 'transform 500ms ease-out';
-          });
-        });
+    const handleScroll = () => {
+      if (isScrollingRef.current) return;
+      
+      const scrollLeft = container.scrollLeft;
+      const singleSetWidth = container.scrollWidth / 3; // Since we have 3 sets of products
+      
+      // If scrolled past the end of the second set, jump to first set
+      if (scrollLeft >= singleSetWidth * 2 - 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth;
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
       }
-      // If we're before the first set, jump to second set
-      else if (currentIndex < winterProducts.length) {
-        carousel.style.transition = 'none';
-        setCurrentIndex(winterProducts.length * 2 - 1);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            carousel.style.transition = 'transform 500ms ease-out';
-          });
-        });
+      // If scrolled before the first set, jump to second set
+      else if (scrollLeft <= 100) {
+        isScrollingRef.current = true;
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = singleSetWidth * 2 - (container.scrollWidth / 3);
+        setTimeout(() => {
+          container.style.scrollBehavior = 'smooth';
+          isScrollingRef.current = false;
+        }, 50);
       }
     };
 
-    carousel.addEventListener('transitionend', handleTransitionEnd);
-    return () => carousel.removeEventListener('transitionend', handleTransitionEnd);
-  }, [currentIndex]);
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Auto-play functionality
+  // Auto-scroll to middle set on mount to enable infinite scroll in both directions
   useEffect(() => {
-    if (isAutoPlaying) {
-      autoPlayRef.current = setInterval(() => {
-        setCurrentIndex((prev) => prev + 1);
-      }, 4000);
+    if (carouselRef.current) {
+      const singleSetWidth = carouselRef.current.scrollWidth / 3;
+      carouselRef.current.scrollLeft = singleSetWidth;
     }
-
-    return () => {
-      if (autoPlayRef.current) {
-        clearInterval(autoPlayRef.current);
-      }
-    };
-  }, [isAutoPlaying]);
-
-  const handlePrevious = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    setIsAutoPlaying(false);
-    setCurrentIndex((prev) => prev + 1);
-  };
+  }, []);
 
   // Add a placeholder function for product clicks
   const handleProductClick = () => {
@@ -175,60 +157,39 @@ export function WinterCollection({ onNavigateShop }: WinterCollectionProps) {
             Our premium winter essentials to keep you cozy all season long
           </p>
         </div>
+      </div>
 
-        {/* Carousel Track */}
-        <div 
-          className="flex-1 overflow-x-auto scrollbar-hide mb-6" 
-          ref={carouselRef}
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          <div
-            className="carousel-track flex transition-transform duration-500 ease-out"
-            style={{
-              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`
-            }}
-          >
-            {extendedProducts.map((product, index) => (
-              <div
-                key={`${product.id}-${index}`}
-                className="flex-shrink-0 px-2 sm:px-3 md:px-4"
-                style={{ width: `${100 / itemsPerView}%` }}
-              >
-                <div className="h-full">
-                  <ProductCard {...product} id={product.id} onClick={handleProductClick} />
-                </div>
+      {/* Carousel Track - Full Width */}
+      <div 
+        className="overflow-x-auto scrollbar-hide mb-6 scroll-smooth w-full"
+        ref={carouselRef}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        <div className="flex w-max">
+          {extendedProducts.map((product, index) => (
+            <div
+              key={`${product.id}-${index}`}
+              className="flex-shrink-0 px-2 sm:px-3 md:px-4"
+              style={{ width: `${100 / itemsPerView}%` }}
+            >
+              <div className="h-full">
+                <ProductCard {...product} id={product.id} onClick={handleProductClick} />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
 
-        {/* Navigation Arrows */}
-        <div className="flex justify-center gap-4 mb-10">
-          <button
-            onClick={handlePrevious}
-            className="flex-shrink-0 w-12 h-12 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors rounded-full"
-            aria-label="Previous products"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={handleNext}
-            className="flex-shrink-0 w-12 h-12 flex items-center justify-center border-2 border-black hover:bg-black hover:text-white transition-colors rounded-full"
-            aria-label="Next products"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* CTA Button */}
         <div className="text-center mb-10 sm:mb-14">
           <button

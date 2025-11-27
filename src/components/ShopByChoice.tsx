@@ -106,7 +106,7 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
   };
 
   return (
-    <section className="py-3 bg-white">
+    <section className="py-3 bg-white" style={{marginTop : '-3rem'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -139,55 +139,57 @@ export function ShopByChoice({ onNavigateShop }: ShopByChoiceProps) {
             </button>
           </div>
         </div>
-
-        {/* Scrollable Container */}
-        <div className="relative">
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
-            {extendedCategories.map((category, index) => (
-              <button
-                key={`${category.id}-${index}`}
-                onClick={onNavigateShop}
-                className="flex-shrink-0 group"
-              >
-                <div className="w-[280px] sm:w-[320px]">
-                  {/* Image Container */}
-                  <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
-                    <ImageWithFallback
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  
-                  {/* Category Name */}
-                  <div className="text-left">
-                    <h3 className="text-lg group-hover:opacity-60 transition-opacity">
-                      {category.name}
-                    </h3>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Gradient Overlays for better UX */}
-          <div className="absolute left-0 top-0 bottom-4 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
-        </div>
       </div>
 
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+      {/* Scrollable Container - Full Width */}
+      <div className="relative w-full">
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-4 w-full"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          {extendedCategories.map((category, index) => (
+            <button
+              key={`${category.id}-${index}`}
+              onClick={onNavigateShop}
+              className="flex-shrink-0 group"
+            >
+              <div className="w-[280px] sm:w-[320px]">
+                {/* Image Container */}
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
+                  <ImageWithFallback
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                
+                {/* Category Name */}
+                <div className="text-left">
+                  <h3 className="text-lg group-hover:opacity-60 transition-opacity">
+                    {category.name}
+                  </h3>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Gradient Overlays for better UX */}
+        <div className="absolute left-0 top-0 bottom-4 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
     </section>
   );
 }
