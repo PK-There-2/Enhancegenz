@@ -122,23 +122,36 @@ export function Hero({ onNavigateShop }: HeroProps) {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex flex-col gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={() => {
+                const target = document.getElementById('best-sellers');
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-white-600 hover:to-black-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Explore Now
+            </button>
+            <button
+              onClick={onNavigateShop}
+              className="px-8 py-4 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Explore Collections
+            </button>
+          </div>
           <button
             onClick={() => {
-              const target = document.getElementById('best-sellers');
+              const target = document.getElementById('winter-collection');
               if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
-            className="px-8 py-4 bg-black text-white hover:bg-gradient-to-r hover:from-white-600 hover:to-black-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            className="px-8 py-4 bg-gradient-to-br from-blue-50 to-cyan-100 text-blue-900 border-2 border-blue-200 hover:from-blue-100 hover:to-cyan-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 rounded-lg font-medium backdrop-blur-sm"
           >
-            Explore Now
-          </button>
-          <button
-            onClick={onNavigateShop}
-            className="px-8 py-4 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-          >
-            Explore Collections
+            Winter Collection '25
           </button>
         </div>
       </div>
